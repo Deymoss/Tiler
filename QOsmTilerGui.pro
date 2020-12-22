@@ -11,11 +11,13 @@ CONFIG += c++11
 SOURCES += \
     main.cpp \
     threadclass.cpp \
+    tilerinterface.cpp \
     widget.cpp
 
 HEADERS += \
     MainStruct.h \
     threadclass.h \
+    tilerinterface.h \
     widget.h
 
 INCLUDEPATH += /usr/local/include
