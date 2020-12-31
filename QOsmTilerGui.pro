@@ -10,13 +10,13 @@ CONFIG += c++11
 
 SOURCES += \
     main.cpp \
-    threadclass.cpp \
+    queuebuilder.cpp \
     tilerinterface.cpp \
     widget.cpp
 
 HEADERS += \
     MainStruct.h \
-    threadclass.h \
+    queuebuilder.h \
     tilerinterface.h \
     widget.h
 

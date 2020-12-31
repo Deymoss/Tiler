@@ -13,5 +13,11 @@ struct MainStruct
     unsigned int endLevel;
     QString pluginName;
 };
+struct TileStruct
+{
+    uint32_t x;
+    uint32_t y;
+    uint32_t zoom;
+};
 
 #endif // MAINSTRUCT_H

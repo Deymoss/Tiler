@@ -13,16 +13,8 @@
 #include <iomanip>
 #include <QtDebug>
 #include <limits>
-#include "threadclass.h"
+#include "queuebuilder.h"
 #include "MainStruct.h"
-
-#include <osmscout/Database.h>
-#include <osmscout/MapService.h>
-
-#include <osmscout/MapPainterQt.h>
-
-#include <osmscout/util/StopClock.h>
-#include <osmscout/util/Tiling.h>
 
 class Widget : public QWidget
 {
@@ -51,10 +43,6 @@ public:
     QLabel * endZoomLabel;
     QLabel * pluginNameLabel;
     QPushButton * startButton;
-    void MergeTilesToMapData(const std::list<osmscout::TileRef>& centerTiles,
-                             const osmscout::MapService::TypeDefinition& ringTypeDefinition,
-                             const std::list<osmscout::TileRef>& ringTiles,
-                             osmscout::MapData& data);
 public slots:
     void drawTile();
 };
