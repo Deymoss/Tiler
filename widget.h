@@ -13,8 +13,8 @@
 #include <iomanip>
 #include <QtDebug>
 #include <limits>
-#include "queuebuilder.h"
 #include "MainStruct.h"
+#include "tilerinterface.h"
 
 class Widget : public QWidget
 {
@@ -43,6 +43,7 @@ public:
     QLabel * endZoomLabel;
     QLabel * pluginNameLabel;
     QPushButton * startButton;
+    TilerInterface * interface;
 public slots:
     void drawTile();
 };

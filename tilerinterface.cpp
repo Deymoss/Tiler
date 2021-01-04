@@ -34,7 +34,8 @@ void TilerInterface::checkData()
 
 void TilerInterface::throwData(MainStruct data)
 {
-
+    builder = new QueueBuilder(data);
+    builder->start();
 }
 void TilerInterface::setMap(QString map)
 {

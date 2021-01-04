@@ -83,7 +83,9 @@ void QueueBuilder::run()
                 tileData.y = y;
                 tileData.zoom = level.Get();
                 tileVector.push_back(tileData);
+                qDebug()<<tileData.x<<" "<<tileData.y<<" "<<tileData.zoom;
             }
         }
     }
+    
 }

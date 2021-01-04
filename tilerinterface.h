@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include "MainStruct.h"
+#include "queuebuilder.h"
 #include <QString>
 #include <QDebug>
 
@@ -32,6 +33,7 @@ public:
     QString getPluginName();
     void checkData();
     void throwData(MainStruct data);
+    QueueBuilder * builder;
 private:
     QString  map;
     QString  style;

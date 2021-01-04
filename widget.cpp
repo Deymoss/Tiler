@@ -61,7 +61,7 @@ Widget::~Widget()
 }
 void Widget::drawTile()
 {
-    
+    interface = new TilerInterface();
     QString  map;
     QString  style;
     double       latTop,latBottom,lonLeft,lonRight;
@@ -78,7 +78,14 @@ void Widget::drawTile()
     lonRight = longitudeRightEdit->text().toDouble();
     startLevel = startZoomEdit->text().toUInt();
     endLevel = endZoomEdit->text().toUInt();
-
-
-
+    interface->setMap(map);
+    interface->setStyle(style);
+    interface->setLatTop(latTop);
+    interface->setLatBottom(latBottom);
+    interface->setLonLeft(lonLeft);
+    interface->setLonRight(lonRight);
+    interface->setStartLevel(startLevel);
+    interface->setEndLevel(endLevel);
+    interface->setPluginName(pluginName);
+    interface->checkData();
 }
