@@ -13,6 +13,7 @@
 #include <QtDebug>
 #include <limits>
 #include <QVector>
+#include <QMutex>
 
 #include <osmscout/Database.h>
 #include <osmscout/MapService.h>
@@ -26,13 +27,18 @@ class QueueBuilder : public QThread
     Q_OBJECT
 public:
     QueueBuilder(MainStruct data);
+    ~QueueBuilder();
     void run() override;
+    TileStruct getNext();
 private:
     MainStruct data;
     TileStruct tileData;
-    QVector<TileStruct> tileVector;
+    QMutex *mutex;
+    QVector<TileStruct*> tileVector;
+    QVector<TileStruct*> copyTileVector;
 signals:
-    void zoomFinished();
+    void signalBegin();//когда начинает строить
+    void signalEnd();//когда завершилось построение
 };
 
 #endif // THREADCLASS_H

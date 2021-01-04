@@ -18,6 +18,8 @@ struct TileStruct
     uint32_t x;
     uint32_t y;
     uint32_t zoom;
+    QString  map;
+    QString  style;
 };
 
 #endif // MAINSTRUCT_H

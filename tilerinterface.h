@@ -1,4 +1,4 @@
-#ifndef TILERINTERFACE_H
+﻿#ifndef TILERINTERFACE_H
 #define TILERINTERFACE_H
 
 #include <QObject>
@@ -6,6 +6,7 @@
 #include "queuebuilder.h"
 #include <QString>
 #include <QDebug>
+#include "renderclass.h"
 
 class TilerInterface : public QObject
 {
@@ -37,6 +38,8 @@ public:
 private:
     QString  map;
     QString  style;
+    int countOfThreads = 4;
+    QVector<RenderClass*> renderThreads;
     double   latTop;
     double latBottom;
     double lonLeft;
@@ -44,6 +47,12 @@ private:
     unsigned int startLevel;
     unsigned int endLevel;
     QString pluginName;
+
+signals:
+    void signalError();//enum с ошибками
+private slots:
+    void slotBegin();
+    void slotEnd();
 };
 
 #endif // TILERINTERFACE_H

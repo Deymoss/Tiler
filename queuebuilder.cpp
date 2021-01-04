@@ -3,23 +3,16 @@
 QueueBuilder::QueueBuilder(MainStruct data)
 {
     this->data = data;
+    mutex = new QMutex();
+}
+
+QueueBuilder::~QueueBuilder()
+{
+    delete mutex;
 }
 
 void QueueBuilder::run()
 {
-    osmscout::DatabaseParameter databaseParameter;
-    osmscout::DatabaseRef       database=std::make_shared<osmscout::Database>(databaseParameter);
-    osmscout::MapServiceRef     mapService=std::make_shared<osmscout::MapService>(database);
-    if (!database->Open(data.map.toStdString())) {
-        std::cerr << "Cannot open database" << std::endl;
-
-        exit();
-    }
-    osmscout::StyleConfigRef styleConfig=std::make_shared<osmscout::StyleConfig>(database->GetTypeConfig());
-    if (!styleConfig->Load(data.style.toStdString())) {
-        std::cerr << "Cannot open style" << std::endl;
-        exit();
-    }
     osmscout::AreaSearchParameter searchParameter;
 
     searchParameter.SetUseLowZoomOptimization(true);
@@ -40,52 +33,32 @@ void QueueBuilder::run()
         uint32_t                yTileEnd=std::max(tileA.GetY(),tileB.GetY());
         uint32_t                yTileCount=yTileEnd-yTileStart+1;
 
-        std::cout << "Drawing zoom " << level << ", " << (xTileCount)*(yTileCount) << " tiles [" << xTileStart << "," << yTileStart << " - " <<  xTileEnd << "," << yTileEnd << "]" << std::endl;
-
-        double minTime=std::numeric_limits<double>::max();
-        double maxTime=0.0;
-        double totalTime=0.0;
+        std::cout << "Managing zoom " << level << ", " << (xTileCount)*(yTileCount) << " tiles [" << xTileStart << "," << yTileStart << " - " <<  xTileEnd << "," << yTileEnd << "]" << std::endl;
 
         osmscout::MapService::TypeDefinition typeDefinition;
 
-        for (const auto& type : database->GetTypeConfig()->GetTypes()) {
-            bool hasLabel=false;
-
-            if (type->CanBeNode()) {
-                if (styleConfig->HasNodeTextStyles(type,
-                                                   magnification)) {
-                    typeDefinition.nodeTypes.Set(type);
-                    hasLabel=true;
-                }
-            }
-
-            if (type->CanBeArea()) {
-                if (styleConfig->HasAreaTextStyles(type,
-                                                   magnification)) {
-                    if (type->GetOptimizeLowZoom() && searchParameter.GetUseLowZoomOptimization()) {
-                        typeDefinition.optimizedAreaTypes.Set(type);
-                    }
-                    else {
-                        typeDefinition.areaTypes.Set(type);
-                    }
-
-                    hasLabel=true;
-                }
-            }
-
-            if (hasLabel) {
-                std::cout << "TYPE " << type->GetName() << " might have labels" << std::endl;
-            }
-        }
         for (uint32_t y=yTileStart; y<=yTileEnd; y++) {
             for (uint32_t x=xTileStart; x<=xTileEnd; x++) {
                 tileData.x = x;
                 tileData.y = y;
                 tileData.zoom = level.Get();
+                tileData.map = data.map;
+                tileData.style = data.style;
                 tileVector.push_back(tileData);
                 qDebug()<<tileData.x<<" "<<tileData.y<<" "<<tileData.zoom;
             }
         }
     }
     
+}
+
+TileStruct QueueBuilder::getNext()
+{
+    TileStruct output;
+
+    mutex->lock();
+    output = tileVector.last();
+    tileVector.pop_back();
+    mutex->unlock();
+    return output;
 }

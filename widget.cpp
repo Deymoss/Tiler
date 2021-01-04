@@ -1,8 +1,4 @@
 #include "widget.h"
-static const unsigned int tileWidth=256;
-static const unsigned int tileHeight=256;
-static const double       DPI=96.0;
-static const int          tileRingSize=1;
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
 {

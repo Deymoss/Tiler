@@ -28,14 +28,32 @@ void TilerInterface::checkData()
    }
    else
    {
-       qDebug()<<"some data is empty";
+       qDebug()<<"some data is empty";//при окончании
    }
 }
 
 void TilerInterface::throwData(MainStruct data)
 {
     builder = new QueueBuilder(data);
+    connect(builder, SIGNAL(signalBegin()),this,SLOT(slotBegin()));
+    connect(builder, SIGNAL(signalEnd()),this,SLOT(slotEnd()));
     builder->start();
+}
+
+void TilerInterface::slotBegin()
+{
+    //при старте
+}
+
+void TilerInterface::slotEnd()
+{
+    //при окончании
+    RenderClass *renderClass;
+    for(int i=0;i<countOfThreads;i++)
+    {
+        renderClass = new RenderClass(builder);
+        renderThreads.push_back(renderClass);
+    }
 }
 void TilerInterface::setMap(QString map)
 {
