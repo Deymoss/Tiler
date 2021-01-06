@@ -3,19 +3,19 @@ static const unsigned int tileWidth=256;
 static const unsigned int tileHeight=256;
 static const double       DPI=96.0;
 static const int          tileRingSize=1;
+static const QString map = "/home/deymos/imported_data";
+static const QString style = "/home/deymos/SIMURAN/libosmscout/stylesheets/standard.oss";
 RenderClass::RenderClass(QueueBuilder * builder)
 {
     currentBuilder = builder;
-
+    start();
 }
 void RenderClass::run()
 {
     TileStruct tileStruct;
-    while(!isInterruptionRequested())
-    {
-        tileStruct = currentBuilder->getNext();
-    }
-
+    QDir dir = QDir::current();
+    if(!dir.exists("offline_tiles"))
+        dir.mkdir("offline_tiles");
 
     double lattitude, longitude, longitudeOfTheTopRightCorner, lattitudeOfTheTopRightCorner, longitudeOfTheBottomLeftCorner,lattitudeOfTheBottomLeftCorner;
     double stepLattitude, stepLongitude;
@@ -24,7 +24,10 @@ void RenderClass::run()
     osmscout::MapServiceRef     mapService=std::make_shared<osmscout::MapService>(database);
     osmscout::GeoBox    boundingBox;
     osmscout::MapData   data;
-    if (!database->Open(tileStruct.map.toStdString())) {
+    while(!isInterruptionRequested())
+    {
+        tileStruct = currentBuilder->getNext();
+    if (!database->Open(map.toStdString())) {//добавить потом struct
         std::cerr << "Cannot open database" << std::endl;
 
         exit();
@@ -32,12 +35,13 @@ void RenderClass::run()
 
     osmscout::StyleConfigRef styleConfig=std::make_shared<osmscout::StyleConfig>(database->GetTypeConfig());
 
-    if (!styleConfig->Load(tileStruct.style.toStdString())) {
+    if (!styleConfig->Load(style.toStdString())) {//struct
         std::cerr << "Cannot open style" << std::endl;
     }
     osmscout::TileProjection      projection;
     osmscout::MapParameter        drawParameter;
-    osmscout::Magnification magnification(tileStruct.zoom);
+    osmscout::MagnificationLevel level(tileStruct.zoom);
+    osmscout::Magnification magnification(level);
     osmscout::AreaSearchParameter searchParameter;
 
     drawParameter.SetFontName("/usr/share/fonts/truetype/msttcorefonts/Verdana.ttf");
@@ -143,9 +147,7 @@ void RenderClass::run()
 
     std::string output=std::to_string(tileStruct.zoom)+"_"+std::to_string(tileStruct.x)+"_"+std::to_string(tileStruct.y)+".ppm";
 
-    QDir dir = QDir::current();
-    if(!dir.exists("offline_tiles"))
-        dir.mkdir("offline_tiles");
+
     uint32_t xOfTile = QString("%1").arg(tileStruct.x).toUInt();
     uint32_t yOfTile = QString("%1").arg(tileStruct.y).toUInt();
     uint32_t zoom = QString("%1").arg(tileStruct.zoom).toUInt();
@@ -160,6 +162,7 @@ void RenderClass::run()
     //qDebug()<<stepLattitude<<" "<<stepLongitude;
     pixmap.save(QString("offline_tiles/%0_100-l-%1-%2-%3-%4-%5-%6.png").arg("osm_custom").arg(1).arg(tileStruct.zoom).arg(tileStruct.x).arg(tileStruct.y)
                 .arg(stepLattitude).arg(stepLongitude));
+    }
 
 }
     void RenderClass::MergeTilesToMapData(const std::list<osmscout::TileRef>& centerTiles,

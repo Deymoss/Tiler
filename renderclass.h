@@ -1,10 +1,16 @@
 #ifndef RENDERCLASS_H
 #define RENDERCLASS_H
 
+#include <QPainter>
+#include <QDir>
+
+#include <iomanip>
+#include <QtDebug>
+#include <limits>
+
 #include <QThread>
 #include "queuebuilder.h"
 #include "MainStruct.h"
-#include <QPainter>
 #include <osmscout/Database.h>
 #include <osmscout/MapService.h>
 

@@ -12,7 +12,8 @@ TilerInterface::~TilerInterface()
 
 void TilerInterface::checkData()
 {
-   if(map != NULL && style !=NULL && latTop && latBottom && lonLeft && lonRight && startLevel && endLevel && pluginName != NULL)
+    //сделать проверку каждого параметра отдельно и ошибку для каждого параметра
+   if(!map.isEmpty() && !style.isEmpty() && latTop && latBottom && lonLeft && lonRight && startLevel && endLevel && !pluginName.isEmpty())
    {
        MainStruct data;
        data.map = map;
@@ -37,7 +38,7 @@ void TilerInterface::throwData(MainStruct data)
     builder = new QueueBuilder(data);
     connect(builder, SIGNAL(signalBegin()),this,SLOT(slotBegin()));
     connect(builder, SIGNAL(signalEnd()),this,SLOT(slotEnd()));
-    builder->start();
+    builder->startWork();
 }
 
 void TilerInterface::slotBegin()
@@ -48,12 +49,18 @@ void TilerInterface::slotBegin()
 void TilerInterface::slotEnd()
 {
     //при окончании
-    RenderClass *renderClass;
-    for(int i=0;i<countOfThreads;i++)
-    {
-        renderClass = new RenderClass(builder);
-        renderThreads.push_back(renderClass);
-    }
+//    countOfThreads = 4;
+//    RenderClass *renderClass;
+//    for(int i=0;i<countOfThreads;i++)
+//    {
+//        renderClass = new RenderClass(builder);
+//        renderThreads.push_back(renderClass);
+//    }
+}
+
+void TilerInterface::slotLastElement()
+{
+
 }
 void TilerInterface::setMap(QString map)
 {

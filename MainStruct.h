@@ -17,9 +17,9 @@ struct TileStruct
 {
     uint32_t x;
     uint32_t y;
-    uint32_t zoom;
-    QString  map;
-    QString  style;
+    uint8_t zoom;
+//    QString  map;
+//    QString  style; надо передать в рендер
 };
 
 #endif // MAINSTRUCT_H

@@ -46,5 +46,6 @@ public:
     TilerInterface * interface;
 public slots:
     void drawTile();
+    void slotError(TilerInterface::errors err);
 };
 #endif // WIDGET_H

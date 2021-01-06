@@ -11,9 +11,11 @@
 class TilerInterface : public QObject
 {
     Q_OBJECT
+    Q_ENUMS(errors)
 public:
     TilerInterface();
     ~TilerInterface();
+    enum errors{errorNullData};//написать все ошибки
     void setMap(QString map);
     void setStyle(QString style);
     void setLatTop(double latTop);
@@ -49,10 +51,13 @@ private:
     QString pluginName;
 
 signals:
-    void signalError();//enum с ошибками
+    void signalError(TilerInterface::errors err);//enum с ошибками
+
 private slots:
     void slotBegin();
     void slotEnd();
+    void slotLastElement();
+
 };
 
 #endif // TILERINTERFACE_H

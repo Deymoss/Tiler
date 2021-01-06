@@ -50,6 +50,7 @@ Widget::Widget(QWidget *parent)
     pluginNameEdit->setText("osm_custom");
     mainLayout->addWidget(startButton,9,0,1,2);
     connect(startButton, &QPushButton::clicked, this, &Widget::drawTile);
+
 }
 
 Widget::~Widget()
@@ -58,6 +59,7 @@ Widget::~Widget()
 void Widget::drawTile()
 {
     interface = new TilerInterface();
+    connect(interface, SIGNAL(signalError(TilerInterface::errors)),this,SLOT(slotError(TilerInterface::errors)));
     QString  map;
     QString  style;
     double       latTop,latBottom,lonLeft,lonRight;
@@ -84,4 +86,9 @@ void Widget::drawTile()
     interface->setEndLevel(endLevel);
     interface->setPluginName(pluginName);
     interface->checkData();
+}
+
+void Widget::slotError(TilerInterface::errors err)
+{
+
 }
