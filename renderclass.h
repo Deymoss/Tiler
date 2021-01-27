@@ -11,6 +11,7 @@
 #include <QThread>
 #include "queuebuilder.h"
 #include "MainStruct.h"
+#include "tiledataclass.h"
 #include <osmscout/Database.h>
 #include <osmscout/MapService.h>
 
@@ -31,7 +32,7 @@ public:
                              const osmscout::MapService::TypeDefinition& ringTypeDefinition,
                              const std::list<osmscout::TileRef>& ringTiles,
                              osmscout::MapData& data);
-    void getN(QueueBuilder * builder);
+    void getN(QueueBuilder * builder, MainStruct data);
 private:
     QueueBuilder * currentBuilder;
 };

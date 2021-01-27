@@ -48,14 +48,14 @@ void TilerInterface::slotBegin()
 
 void TilerInterface::slotEnd()
 {
-    //при окончании
-//    countOfThreads = 4;
-//    RenderClass *renderClass;
-//    for(int i=0;i<countOfThreads;i++)
-//    {
-//        renderClass = new RenderClass(builder);
-//        renderThreads.push_back(renderClass);
-//    }
+//    при окончании
+    countOfThreads = 4;
+    RenderClass *renderClass;
+    for(int i=0;i<countOfThreads;i++)
+    {
+        renderClass = new RenderClass(builder);
+        renderThreads.push_back(renderClass);
+    }
 }
 
 void TilerInterface::slotLastElement()

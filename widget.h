@@ -23,6 +23,7 @@ class Widget : public QWidget
 public:
     Widget(QWidget *parent = nullptr);
     ~Widget();
+    
     QGridLayout * mainLayout;
     QLineEdit * importedDataEdit;
     QLineEdit * stylesheetEdit;

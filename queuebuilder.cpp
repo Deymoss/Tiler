@@ -1,5 +1,7 @@
 #include "queuebuilder.h"
 
+uint16_t QueueBuilder::FillInLevel = 0;
+
 QueueBuilder::QueueBuilder(MainStruct data)
 {
     currentData = data;
@@ -29,8 +31,17 @@ void QueueBuilder::stopWork()
 void QueueBuilder::run()
 {
     emit signalBegin();
-    QTemporaryFile file("zoom-1");
-    tileVector = new QVector<TileStruct*>();
+    int i=0;
+        QString fileName = "queue-"+QString().number(i+1);
+        QTemporaryFile * file = new QTemporaryFile(QDir::tempPath() + "/TileQueue/" + fileName);
+        filesVector.push_back(file);
+    if(filesVector.at(0)->open())
+    {
+        qDebug()<<"Opened"<<filesVector.at(0)->fileName();
+    }
+    QDataStream dataStream(filesVector.at(0));
+    long int counterOfTiles = 0;
+    tileVector = new QVector<TileDataClass*>();
     osmscout::AreaSearchParameter searchParameter;
     searchParameter.SetUseLowZoomOptimization(true);
     searchParameter.SetMaximumAreaLevel(3);
@@ -52,35 +63,86 @@ void QueueBuilder::run()
         uint32_t                yTileCount=yTileEnd-yTileStart+1;
 
         std::cout << "Managing zoom " << level << ", " << (xTileCount)*(yTileCount) << " tiles [" << xTileStart << "," << yTileStart << " - " <<  xTileEnd << "," << yTileEnd << "]" << std::endl;
-        j += (xTileCount)*(yTileCount)-1;
+
         osmscout::MapService::TypeDefinition typeDefinition;
+
         for (uint32_t y=yTileStart; y<=yTileEnd; y++) {
             for (uint32_t x=xTileStart; x<=xTileEnd; x++) {
-                tileData = new TileStruct;
-                tileData->x = x;
-                tileData->y = y;
-                tileData->zoom = level.Get();
-             //   tileData->map = currentData.map;
-               // tileData->style = currentData.style;
-                tileVector->append(tileData);
-                //qDebug()<<tileData.x<<" "<<tileData.y<<" "<<tileData.zoom;
+                tileData = new TileDataClass(x,y,level.Get());
+                if(counterOfTiles>=30000000)
+                {
+                    filesVector.at(i)->flush();
+                    i++;
+                    counterOfTiles = 0;
+                    QTemporaryFile * file = new QTemporaryFile(QDir::tempPath() + "/TileQueue/" + fileName);
+                    filesVector.push_back(file);
+                    if(filesVector.at(i)->open())
+                    {
+                    qDebug()<<"Opened "<<filesVector.at(i)->fileName();
+                    }
+                    else
+                    {
+                        qDebug()<<"Not opened";
+                    }
+                    dataStream.setDevice(filesVector.at(i));
+                }
+                counterOfTiles++;
+                //tileVector->append(tileData);
+                dataStream << TileDataClass(tileData->getX(),tileData->getY(),tileData->getZoom());
+                //qDebug()<<tileData->getX()<<" "<<tileData->getY()<<" "<<tileData->getZoom();
+                delete tileData;
             }
         }
+       filesVector.at(i)->flush();
+
     }
-    qDebug()<<tileVector->size()<<" "<<j;
+    for(int j=0; j<filesVector.size();j++)
+    {
+
+     filesVector.at(j)->close();
+    }
+    FillInVector();
     emit signalEnd();
 }
 
-TileStruct QueueBuilder::getNext()
+TileDataClass* QueueBuilder::getNext()
 {
-    TileStruct *output = new TileStruct;
+    TileDataClass *output = new TileDataClass(0,0,0);
 
     mutex->lock();
-    output = tileVector->at(j);
-    if(j!=1){
-    j--;
-    }
+    output = tileVector->last();
+    tileVector->pop_back();
     mutex->unlock();
-    qDebug()<<output->x<<" "<<output->y<<" "<<output->zoom;
-    return *output;
+    if(tileVector->size() == 1)
+    {
+        FillInVector();
+    }
+    //qDebug()<<output->x<<" "<<output->y<<" "<<output->zoom;
+    return output;
 }
+
+QVector<TileDataClass *> QueueBuilder::FillInVector()
+{
+
+        if(filesVector.at(FillInLevel)->open())
+        {
+            qDebug()<<"Opened "<<FillInLevel;
+        }
+        QDataStream dataStream(filesVector.at(FillInLevel));
+        dataStream.setDevice(filesVector.at(FillInLevel));
+        while(!dataStream.atEnd())
+        {
+            TileDataClass *tiles = new TileDataClass();
+            dataStream>>*tiles;
+            tileVector->append(tiles);
+        }
+        filesVector.at(FillInLevel)->close();
+        FillInLevel++;
+    qDebug()<<tileVector->size();
+    //qDebug()<<tileVector->at(1)->getX()<<" "<<tileVector->at(2)->getX()<<" "<<tileVector->at(50)->getX();
+    return *tileVector;
+}
+/*
+ * автоматически определяется оператива и 10% от оперативы кусок
+ * или вручную
+ */

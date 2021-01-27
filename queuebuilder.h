@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QThread>
 #include "MainStruct.h"
+#include "tiledataclass.h"
 
 #include <QPainter>
 #include <QDir>
@@ -14,6 +15,7 @@
 #include <limits>
 #include <QVector>
 #include <QTemporaryFile>
+#include <QDataStream>
 #include <QMutex>
 
 #include <osmscout/Database.h>
@@ -32,14 +34,19 @@ public:
     void startWork();
     void pauseWork();
     void stopWork();
-    TileStruct getNext();
+    TileDataClass* getNext();
+    QVector<TileDataClass *> FillInVector();
+    static int openFileCounter;
 private:
     MainStruct currentData;
     void run() override;
-    TileStruct *tileData;
+//    TileStruct *tileData;
+    TileDataClass *tileData;
+    QVector<QTemporaryFile*> filesVector;
+    static uint16_t FillInLevel;
     QMutex *mutex;
     int j = 0;
-    QVector<TileStruct*> *tileVector;
+    QVector<TileDataClass*> *tileVector;
 signals:
     void signalBegin();//когда начинает строить
     void signalEnd();//когда завершилось построениe

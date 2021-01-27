@@ -12,7 +12,7 @@ RenderClass::RenderClass(QueueBuilder * builder)
 }
 void RenderClass::run()
 {
-    TileStruct tileStruct;
+    TileDataClass *tileClass = new TileDataClass();
     QDir dir = QDir::current();
     if(!dir.exists("offline_tiles"))
         dir.mkdir("offline_tiles");
@@ -26,8 +26,8 @@ void RenderClass::run()
     osmscout::MapData   data;
     while(!isInterruptionRequested())
     {
-        tileStruct = currentBuilder->getNext();
-    if (!database->Open(map.toStdString())) {//добавить потом struct
+        tileClass = currentBuilder->getNext();
+    if (!database->Open("/home/deymos/imported_data")) {//добавить потом struct
         std::cerr << "Cannot open database" << std::endl;
 
         exit();
@@ -35,12 +35,12 @@ void RenderClass::run()
 
     osmscout::StyleConfigRef styleConfig=std::make_shared<osmscout::StyleConfig>(database->GetTypeConfig());
 
-    if (!styleConfig->Load(style.toStdString())) {//struct
+    if (!styleConfig->Load("/home/deymos/SIMURAN/libosmscout/stylesheets/standard.oss")) {//struct
         std::cerr << "Cannot open style" << std::endl;
     }
     osmscout::TileProjection      projection;
     osmscout::MapParameter        drawParameter;
-    osmscout::MagnificationLevel level(tileStruct.zoom);
+    osmscout::MagnificationLevel level(tileClass->getZoom());
     osmscout::Magnification magnification(level);
     osmscout::AreaSearchParameter searchParameter;
 
@@ -82,13 +82,13 @@ void RenderClass::run()
     osmscout::MapPainterQt painter(styleConfig);
 
 
-    projection.Set(osmscout::OSMTileId(tileStruct.x,tileStruct.y),
+    projection.Set(osmscout::OSMTileId(tileClass->getX(),tileClass->getY()),
                    magnification,
                    DPI,
                    tileWidth,
                    tileHeight);
     projection.GetDimensions(boundingBox);
-    std::cout << "Drawing tile " << tileStruct.zoom << "." << tileStruct.y << "." << tileStruct.x << " " << boundingBox.GetDisplayText() << std::endl;
+    std::cout << "Drawing tile " << QString::number(tileClass->getZoom()).toInt() << "." << tileClass->getX() << "." << tileClass->getY() << " " << boundingBox.GetDisplayText() << std::endl;
     std::list<osmscout::TileRef> centerTiles;
 
     mapService->LookupTiles(magnification,
@@ -100,9 +100,9 @@ void RenderClass::run()
                                     centerTiles);
     std::map<osmscout::TileKey,osmscout::TileRef> ringTileMap;
 
-    for (uint32_t ringY=tileStruct.y-tileRingSize; ringY<=tileStruct.y+tileRingSize; ringY++) {
-        for (uint32_t ringX=tileStruct.x-tileRingSize; ringX<=tileStruct.x+tileRingSize; ringX++) {
-            if (ringX==tileStruct.x && ringY==tileStruct.y) {
+    for (uint32_t ringY=tileClass->getY()-tileRingSize; ringY<=tileClass->getY()+tileRingSize; ringY++) {
+        for (uint32_t ringX=tileClass->getX()-tileRingSize; ringX<=tileClass->getX()+tileRingSize; ringX++) {
+            if (ringX==tileClass->getX() && ringY==tileClass->getY()) {
                 continue;
             }
 
@@ -145,12 +145,12 @@ void RenderClass::run()
                     data,
                     &qp);
 
-    std::string output=std::to_string(tileStruct.zoom)+"_"+std::to_string(tileStruct.x)+"_"+std::to_string(tileStruct.y)+".ppm";
+    std::string output=std::to_string(tileClass->getZoom())+"_"+std::to_string(tileClass->getX())+"_"+std::to_string(tileClass->getY())+".ppm";
 
 
-    uint32_t xOfTile = QString("%1").arg(tileStruct.x).toUInt();
-    uint32_t yOfTile = QString("%1").arg(tileStruct.y).toUInt();
-    uint32_t zoom = QString("%1").arg(tileStruct.zoom).toUInt();
+    uint32_t xOfTile = QString("%1").arg(tileClass->getX()).toUInt();
+    uint32_t yOfTile = QString("%1").arg(tileClass->getY()).toUInt();
+    uint32_t zoom = QString("%1").arg(tileClass->getZoom()).toUInt();
     longitude = (xOfTile/pow(2,zoom))*360-180;
     lattitude = atan(sinh(M_PI-(yOfTile/pow(2,zoom))*(2*M_PI)))*(180/M_PI);
     longitudeOfTheTopRightCorner = (xOfTile/pow(2,zoom))*360-180;
@@ -160,7 +160,7 @@ void RenderClass::run()
     stepLattitude = (lattitude - lattitudeOfTheTopRightCorner)/256;
     stepLongitude = (longitudeOfTheBottomLeftCorner - longitude)/256;
     //qDebug()<<stepLattitude<<" "<<stepLongitude;
-    pixmap.save(QString("offline_tiles/%0_100-l-%1-%2-%3-%4-%5-%6.png").arg("osm_custom").arg(1).arg(tileStruct.zoom).arg(tileStruct.x).arg(tileStruct.y)
+    pixmap.save(QString("offline_tiles/%0_100-l-%1-%2-%3-%4-%5-%6.png").arg("osm_custom").arg(1).arg(tileClass->getZoom()).arg(tileClass->getX()).arg(tileClass->getY())
                 .arg(stepLattitude).arg(stepLongitude));
     }
 

@@ -12,6 +12,7 @@ SOURCES += \
     main.cpp \
     queuebuilder.cpp \
     renderclass.cpp \
+    tiledataclass.cpp \
     tilerinterface.cpp \
     widget.cpp
 
@@ -19,6 +20,7 @@ HEADERS += \
     MainStruct.h \
     queuebuilder.h \
     renderclass.h \
+    tiledataclass.h \
     tilerinterface.h \
     widget.h
 
