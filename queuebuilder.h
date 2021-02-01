@@ -36,6 +36,8 @@ public:
     void startWork();
     void pauseWork();
     void stopWork();
+    QString getMapPath();
+    QString getStypePath();
     TileDataClass* getNext();
     QVector<TileDataClass *> FillInVector();
     static int openFileCounter;

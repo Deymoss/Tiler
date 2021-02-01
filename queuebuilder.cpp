@@ -30,6 +30,16 @@ void QueueBuilder::stopWork()
 
 }
 
+QString QueueBuilder::getMapPath()
+{
+    return currentData.map;
+}
+
+QString QueueBuilder::getStypePath()
+{
+    return currentData.style;
+}
+
 void QueueBuilder::run()
 {
     emit signalBegin();

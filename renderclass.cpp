@@ -3,8 +3,6 @@ static const unsigned int tileWidth=256;
 static const unsigned int tileHeight=256;
 static const double       DPI=96.0;
 static const int          tileRingSize=1;
-static const QString map = "/home/deymos/imported_data";
-static const QString style = "/home/deymos/SIMURAN/libosmscout/stylesheets/standard.oss";
 RenderClass::RenderClass(QueueBuilder * builder)
 {
     currentBuilder = builder;
@@ -27,7 +25,7 @@ void RenderClass::run()
     while(!isInterruptionRequested())
     {
         tileClass = currentBuilder->getNext();
-    if (!database->Open("/home/deymos/imported_data")) {//добавить потом struct
+    if (!database->Open(currentBuilder->getMapPath().toStdString())) {//добавить потом struct
         std::cerr << "Cannot open database" << std::endl;
 
         exit();
@@ -35,7 +33,7 @@ void RenderClass::run()
 
     osmscout::StyleConfigRef styleConfig=std::make_shared<osmscout::StyleConfig>(database->GetTypeConfig());
 
-    if (!styleConfig->Load("/home/deymos/SIMURAN/libosmscout/stylesheets/standard.oss")) {//struct
+    if (!styleConfig->Load(currentBuilder->getStypePath().toStdString())) {//struct
         std::cerr << "Cannot open style" << std::endl;
     }
     osmscout::TileProjection      projection;
