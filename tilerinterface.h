@@ -50,13 +50,17 @@ private:
     unsigned int endLevel;
     QString pluginName;
 
+
 signals:
     void signalError(TilerInterface::errors err);//enum с ошибками
-
+    void signalToWidget();
+    void throwDataToWidget(quint32 count);
 private slots:
     void slotBegin();
     void slotEnd();
     void slotLastElement();
+    void slotFinishedRenderTile();
+    void slotCountOfTiles(quint32 count);
 
 };
 

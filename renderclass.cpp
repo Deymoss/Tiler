@@ -162,6 +162,7 @@ void RenderClass::run()
     //qDebug()<<stepLattitude<<" "<<stepLongitude;
     pixmap.save(QString("offline_tiles/%0_100-l-%1-%2-%3-%4-%5-%6.png").arg("osm_custom").arg(1).arg(tileClass->getZoom()).arg(tileClass->getX()).arg(tileClass->getY())
                 .arg(stepLattitude).arg(stepLongitude));
+    emit endOfRender();
     }
 
 }
@@ -275,6 +276,7 @@ void RenderClass::run()
         if (copyTime.GetMilliseconds()>20) {
             osmscout::log.Warn() << "Copying data from tile to MapData took " << copyTime.ResultString();
         }
+
     }
 
 

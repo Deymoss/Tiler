@@ -3,6 +3,7 @@
 
 #include <QPainter>
 #include <QDir>
+#include <QObject>
 
 #include <iomanip>
 #include <QtDebug>
@@ -22,6 +23,7 @@
 
 class RenderClass : public QThread
 {
+    Q_OBJECT
 public:
     RenderClass(QueueBuilder * builder);
     void run() override;
@@ -35,6 +37,8 @@ public:
     void getN(QueueBuilder * builder, MainStruct data);
 private:
     QueueBuilder * currentBuilder;
+signals:
+    void endOfRender();
 };
 
 #endif // RENDERCLASS_H

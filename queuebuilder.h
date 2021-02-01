@@ -8,6 +8,8 @@
 
 #include <QPainter>
 #include <QDir>
+#include <limits>
+#include <QMessageBox>
 
 #include <iostream>
 #include <iomanip>
@@ -51,6 +53,7 @@ signals:
     void signalBegin();//когда начинает строить
     void signalEnd();//когда завершилось построениe
     void signalLastElement();
+    void signalThrowCountOfFiles(quint32 count);
 };
 
 #endif // THREADCLASS_H

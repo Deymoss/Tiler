@@ -8,6 +8,9 @@
 #include <QLabel>
 #include <QPainter>
 #include <QDir>
+#include <QProgressBar>
+#include <QTimer>
+#include <QStatusBar>
 
 #include <iostream>
 #include <iomanip>
@@ -43,10 +46,22 @@ public:
     QLabel * startZoomLabel;
     QLabel * endZoomLabel;
     QLabel * pluginNameLabel;
+    QLabel * speedLabel;
     QPushButton * startButton;
+    QProgressBar * progressBar;
     TilerInterface * interface;
+    QTimer * timer;
+    long int countOfTiles;
+    long int tilesFinished = 0;
+    int counter = 0;
+    void plusProgress();
+signals:
+    void signalMessage();
 public slots:
     void drawTile();
     void slotError(TilerInterface::errors err);
+    void slotTileRendered();
+    void slotTakeDataTiles(quint32 count);
+    void slotSpeed();
 };
 #endif // WIDGET_H

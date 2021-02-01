@@ -36,6 +36,8 @@ void TilerInterface::checkData()
 void TilerInterface::throwData(MainStruct data)
 {
     builder = new QueueBuilder(data);
+//    connect(builder, SIGNAL(signalThrowCountOfFiles(long)),this,SLOT(slotCountOfTiles(long)));
+    connect(builder, &QueueBuilder::signalThrowCountOfFiles,this, &TilerInterface::slotCountOfTiles);
     connect(builder, SIGNAL(signalBegin()),this,SLOT(slotBegin()));
     connect(builder, SIGNAL(signalEnd()),this,SLOT(slotEnd()));
     builder->startWork();
@@ -51,16 +53,30 @@ void TilerInterface::slotEnd()
 //    при окончании
     countOfThreads = 4;
     RenderClass *renderClass;
+
     for(int i=0;i<countOfThreads;i++)
     {
         renderClass = new RenderClass(builder);
         renderThreads.push_back(renderClass);
+        connect(renderClass,SIGNAL(endOfRender()),this,SLOT(slotFinishedRenderTile()));
     }
+
 }
 
 void TilerInterface::slotLastElement()
 {
 
+}
+
+void TilerInterface::slotFinishedRenderTile()
+{
+
+    emit signalToWidget();
+}
+
+void TilerInterface::slotCountOfTiles(quint32 count)
+{
+    emit throwDataToWidget(count);
 }
 void TilerInterface::setMap(QString map)
 {

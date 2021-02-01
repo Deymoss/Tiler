@@ -22,7 +22,11 @@ Widget::Widget(QWidget *parent)
     startZoomLabel = new QLabel(tr("Enter start zoom level: "),this);
     endZoomLabel = new QLabel(tr("Enter end zoom level: "),this);
     pluginNameLabel = new QLabel(tr("Enter name of plugin: "),this);
+    speedLabel = new QLabel(this);
     startButton = new QPushButton(tr("Start"),this);
+    progressBar = new QProgressBar(this);
+    timer = new QTimer(this);
+    progressBar->setMinimum(0);
     mainLayout->addWidget(importedDataLabel,0,0,1,1);
     mainLayout->addWidget(stylesheetLabel,1,0,1,1);
     mainLayout->addWidget(lattitudeTopLabel,2,0,1,1);
@@ -48,18 +52,36 @@ Widget::Widget(QWidget *parent)
     mainLayout->addWidget(endZoomEdit,7,1,1,1);
     mainLayout->addWidget(pluginNameEdit,8,1,1,1);
     pluginNameEdit->setText("osm_custom");
-    mainLayout->addWidget(startButton,9,0,1,2);
+    mainLayout->addWidget(startButton,11,0,1,2);
+    mainLayout->addWidget(progressBar,9,0,1,2);
+    mainLayout->addWidget(speedLabel,10,0,1,1);
+    speedLabel->setMaximumHeight(20);
+    speedLabel->setMaximumWidth(100);
+    timer->setInterval(1000);
     connect(startButton, &QPushButton::clicked, this, &Widget::drawTile);
+    connect(timer,&QTimer::timeout,this,&Widget::slotSpeed);
 
 }
 
 Widget::~Widget()
 {
 }
+
+void Widget::plusProgress()
+{
+    progressBar->setMaximum(countOfTiles);
+    QString text = QString("%1 of %2").arg(tilesFinished).arg(countOfTiles);
+    progressBar->setFormat(text);
+    progressBar->setValue(progressBar->value()+1);
+    counter++;
+
+}
 void Widget::drawTile()
 {
     interface = new TilerInterface();
     connect(interface, SIGNAL(signalError(TilerInterface::errors)),this,SLOT(slotError(TilerInterface::errors)));
+    connect(interface,SIGNAL(signalToWidget()),this,SLOT(slotTileRendered()));
+    connect(interface, &TilerInterface::throwDataToWidget,this,&Widget::slotTakeDataTiles);
     QString  map;
     QString  style;
     double       latTop,latBottom,lonLeft,lonRight;
@@ -90,5 +112,25 @@ void Widget::drawTile()
 
 void Widget::slotError(TilerInterface::errors err)
 {
+
+}
+
+void Widget::slotTileRendered()
+{
+    plusProgress();
+    tilesFinished++;
+}
+
+void Widget::slotTakeDataTiles(quint32 count)
+{
+    countOfTiles = count;
+    timer->start();
+}
+
+void Widget::slotSpeed()
+{
+    speedLabel->setText(QString::number(counter)+" tiles/s");
+    speedLabel->setAlignment(Qt::AlignCenter);
+    counter= 0;
 
 }
