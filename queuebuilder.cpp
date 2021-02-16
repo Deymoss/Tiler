@@ -43,6 +43,9 @@ QString QueueBuilder::getStypePath()
 void QueueBuilder::run()
 {
     emit signalBegin();
+    qRegisterMetaType<QVector<QTemporaryFile*> >("QVector<QTemporaryFile*>");
+    qRegisterMetaType<QVector<ConstantStruct> >("QVector<ConstantStruct>");
+    ConstantStruct constants;
     int i=0;
         QString fileName = "queue-"+QString().number(i+1);
         QTemporaryFile * file = new QTemporaryFile(QDir::tempPath() + "/TileQueue/" + fileName);
@@ -51,6 +54,7 @@ void QueueBuilder::run()
     {
         qDebug()<<"Opened"<<filesVector.at(0)->fileName();
     }
+
     QDataStream dataStream(filesVector.at(0));
     long int counterOfTiles = 0;
     tileVector = new QVector<TileDataClass*>();
@@ -80,8 +84,9 @@ void QueueBuilder::run()
         osmscout::MapService::TypeDefinition typeDefinition;
         for (quint32 y=yTileStart; y<=yTileEnd; y++) {
             for (quint32 x=xTileStart; x<=xTileEnd; x++) {
+               // qDebug()<<x<<" "<<y;
                 tileData = new TileDataClass(x,y,level.Get());
-                if(counterOfTiles>=3000000)
+                if(counterOfTiles>=30000000)
                 {
                     filesVector.at(i)->flush();
                     i++;
@@ -106,15 +111,31 @@ void QueueBuilder::run()
             }
         }
        filesVector.at(i)->flush();
-
+        constants.countOfTiles = (xTileCount)*(yTileCount);
+        constants.xTileStart = xTileStart;
+        constants.yTileStart = yTileStart;
+        constants.xTileCount = xTileCount;
+        constants.yTileCount = yTileCount;
+        constantVector.append(constants);
+    }
+    while(constantVector.size()!=20)
+    {
+        constants.countOfTiles = 0;
+        constants.xTileStart = 0;
+        constants.yTileStart = 0;
+        constants.xTileCount = 0;
+        constants.yTileCount = 0;
+        constantVector.append(constants);
     }
     for(int j=0; j<filesVector.size();j++)
     {
 
      filesVector.at(j)->close();
     }
+    FindNecessaryTile *fnc = new FindNecessaryTile(constantVector);
+    fnc->getTile(71,42,7);
     FillInVector();
-    emit signalEnd();
+    emit signalEnd(filesVector,constantVector);
 }
 
 TileDataClass* QueueBuilder::getNext()
@@ -153,6 +174,7 @@ QVector<TileDataClass *> QueueBuilder::FillInVector()
         {
             TileDataClass *tiles = new TileDataClass();
             dataStream>>*tiles;
+            //qDebug()<<tiles->getX()<<" "<<tiles->getY();
             tileVector->append(tiles);//разобраться
         }
         filesVector.at(FillInLevel)->close();
@@ -168,7 +190,3 @@ QVector<TileDataClass *> QueueBuilder::FillInVector()
             exec();
         }
 }
-/*
- * автоматически определяется оператива и 10% от оперативы кусок
- * или вручную
- */

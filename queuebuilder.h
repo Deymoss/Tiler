@@ -10,6 +10,7 @@
 #include <QDir>
 #include <limits>
 #include <QMessageBox>
+#include "findnecessarytile.h"
 
 #include <iostream>
 #include <iomanip>
@@ -24,7 +25,6 @@
 #include <osmscout/MapService.h>
 
 #include <osmscout/MapPainterQt.h>
-
 #include <osmscout/util/StopClock.h>
 #include <osmscout/util/Tiling.h>
 class QueueBuilder : public QThread
@@ -47,13 +47,14 @@ private:
 //    TileStruct *tileData;
     TileDataClass *tileData;
     QVector<QTemporaryFile*> filesVector;
+    QVector<ConstantStruct> constantVector;
     static uint16_t FillInLevel;
     QMutex *mutex;
     int j = 0;
     QVector<TileDataClass*> *tileVector;
 signals:
     void signalBegin();//когда начинает строить
-    void signalEnd();//когда завершилось построениe
+    void signalEnd(QVector<QTemporaryFile*> files, QVector<ConstantStruct> constants);//когда завершилось построениe
     void signalLastElement();
     void signalThrowCountOfFiles(quint32 count);
 };

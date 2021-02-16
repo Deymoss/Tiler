@@ -86,7 +86,7 @@ void RenderClass::run()
                    tileWidth,
                    tileHeight);
     projection.GetDimensions(boundingBox);
-    std::cout << "Drawing tile " << QString::number(tileClass->getZoom()).toInt() << "." << tileClass->getX() << "." << tileClass->getY() << " " << boundingBox.GetDisplayText() << std::endl;
+    //std::cout << "Drawing tile " << QString::number(tileClass->getZoom()).toInt() << "." << tileClass->getX() << "." << tileClass->getY() << " " << boundingBox.GetDisplayText() << std::endl;
     std::list<osmscout::TileRef> centerTiles;
 
     mapService->LookupTiles(magnification,

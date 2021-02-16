@@ -29,7 +29,7 @@ void TilerInterface::checkData()
    }
    else
    {
-       qDebug()<<"some data is empty";//при окончании
+       qDebug()<<"some data is empty";//при оконании
    }
 }
 
@@ -39,7 +39,7 @@ void TilerInterface::throwData(MainStruct data)
 //    connect(builder, SIGNAL(signalThrowCountOfFiles(long)),this,SLOT(slotCountOfTiles(long)));
     connect(builder, &QueueBuilder::signalThrowCountOfFiles,this, &TilerInterface::slotCountOfTiles);
     connect(builder, SIGNAL(signalBegin()),this,SLOT(slotBegin()));
-    connect(builder, SIGNAL(signalEnd()),this,SLOT(slotEnd()));
+    connect(builder, &QueueBuilder::signalEnd, this, &TilerInterface::slotEnd);
     builder->startWork();
 }
 
@@ -48,19 +48,19 @@ void TilerInterface::slotBegin()
     //при старте
 }
 
-void TilerInterface::slotEnd()
+void TilerInterface::slotEnd(QVector<QTemporaryFile*> files, QVector<ConstantStruct> constants)
 {
 //    при окончании
+    this->constants = constants;
     countOfThreads = 4;
     RenderClass *renderClass;
-
+    filesVector = files;
     for(int i=0;i<countOfThreads;i++)
     {
         renderClass = new RenderClass(builder);
         renderThreads.push_back(renderClass);
         connect(renderClass,SIGNAL(endOfRender()),this,SLOT(slotFinishedRenderTile()));
     }
-
 }
 
 void TilerInterface::slotLastElement()
@@ -70,7 +70,7 @@ void TilerInterface::slotLastElement()
 
 void TilerInterface::slotFinishedRenderTile()
 {
-
+    sendData = new SaveToFileClass(filesVector,constants);
     emit signalToWidget();
 }
 

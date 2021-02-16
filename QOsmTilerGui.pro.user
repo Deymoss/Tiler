@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.13.3, 2021-02-01T09:07:35. -->
+<!-- Written by QtCreator 4.13.3, 2021-02-15T23:58:09. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -582,9 +582,8 @@
     <valuelist type="QVariantList" key="CustomOutputParsers"/>
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">QOsmTilerGui2</value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/home/deymos/Рабочий стол/MY_PROJECTS/OpenStreetMapTrash/QOsmTilerGui/QOsmTilerGui.pro</value>
-    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/home/deymos/Рабочий стол/MY_PROJECTS/OpenStreetMapTrash/QOsmTilerGui/QOsmTilerGui.pro</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/home/deymos/speddecker/simuran/QOsmTilerGui/QOsmTilerGui.pro</value>
+    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/home/deymos/speddecker/simuran/QOsmTilerGui/QOsmTilerGui.pro</value>
     <value type="QString" key="RunConfiguration.Arguments"></value>
     <value type="bool" key="RunConfiguration.Arguments.multi">false</value>
     <value type="QString" key="RunConfiguration.OverrideDebuggerStartup"></value>

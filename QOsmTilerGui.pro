@@ -9,17 +9,21 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    findnecessarytile.cpp \
     main.cpp \
     queuebuilder.cpp \
     renderclass.cpp \
+    savetofileclass.cpp \
     tiledataclass.cpp \
     tilerinterface.cpp \
     widget.cpp
 
 HEADERS += \
     MainStruct.h \
+    findnecessarytile.h \
     queuebuilder.h \
     renderclass.h \
+    savetofileclass.h \
     tiledataclass.h \
     tilerinterface.h \
     widget.h
