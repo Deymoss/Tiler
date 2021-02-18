@@ -11,6 +11,7 @@
 #include <limits>
 #include <QMessageBox>
 #include "findnecessarytile.h"
+#include "savetofileclass.h"
 
 #include <iostream>
 #include <iomanip>
@@ -46,6 +47,7 @@ private:
     void run() override;
 //    TileStruct *tileData;
     TileDataClass *tileData;
+    SaveToFileClass *saveToFile;
     QVector<QTemporaryFile*> filesVector;
     QVector<ConstantStruct> constantVector;
     static uint16_t FillInLevel;

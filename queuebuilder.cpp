@@ -43,6 +43,8 @@ QString QueueBuilder::getStypePath()
 void QueueBuilder::run()
 {
     emit signalBegin();
+    double lattitude, longitude, longitudeOfTheTopRightCorner, lattitudeOfTheTopRightCorner, longitudeOfTheBottomLeftCorner,lattitudeOfTheBottomLeftCorner;
+    double stepLattitude, stepLongitude;
     qRegisterMetaType<QVector<QTemporaryFile*> >("QVector<QTemporaryFile*>");
     qRegisterMetaType<QVector<ConstantStruct> >("QVector<ConstantStruct>");
     ConstantStruct constants;
@@ -85,9 +87,20 @@ void QueueBuilder::run()
         for (quint32 y=yTileStart; y<=yTileEnd; y++) {
             for (quint32 x=xTileStart; x<=xTileEnd; x++) {
                // qDebug()<<x<<" "<<y;
-                tileData = new TileDataClass(x,y,level.Get());
+                tileData = new TileDataClass(x,y,level.Get(),0,0);
                 if(counterOfTiles>=30000000)
                 {
+                    uint32_t xOfTile = QString("%1").arg(tileData->x).toUInt();
+                    uint32_t yOfTile = QString("%1").arg(tileData->y).toUInt();
+                    uint32_t zoom = QString("%1").arg(tileData->zoom).toUInt();
+                    longitude = (xOfTile/pow(2,zoom))*360-180;
+                    lattitude = atan(sinh(M_PI-(yOfTile/pow(2,zoom))*(2*M_PI)))*(180/M_PI);
+                    longitudeOfTheTopRightCorner = (xOfTile/pow(2,zoom))*360-180;
+                    lattitudeOfTheTopRightCorner = atan(sinh(M_PI-((yOfTile+1)/pow(2,zoom))*(2*M_PI)))*(180/M_PI);
+                    longitudeOfTheBottomLeftCorner = ((xOfTile+1)/pow(2,zoom))*360-180;
+                    lattitudeOfTheBottomLeftCorner = atan(sinh(M_PI-(yOfTile/pow(2,zoom))*(2*M_PI)))*(180/M_PI);
+                    stepLattitude = (lattitude - lattitudeOfTheTopRightCorner)/256;
+                    stepLongitude = (longitudeOfTheBottomLeftCorner - longitude)/256;
                     filesVector.at(i)->flush();
                     i++;
                     counterOfTiles = 0;
@@ -105,7 +118,7 @@ void QueueBuilder::run()
                 }
                 counterOfTiles++;
                 //tileVector->append(tileData);
-                dataStream << TileDataClass(tileData->getX(),tileData->getY(),tileData->getZoom());
+                dataStream << TileDataClass(tileData->x,tileData->x,tileData->zoom,0,0);
                 //qDebug()<<tileData->getX()<<" "<<tileData->getY()<<" "<<tileData->getZoom();
                 delete tileData;
             }
@@ -140,7 +153,7 @@ void QueueBuilder::run()
 
 TileDataClass* QueueBuilder::getNext()
 {
-    TileDataClass *output = new TileDataClass(0,0,0);
+    TileDataClass *output = new TileDataClass(0,0,0,0,0);
 
     mutex->lock();
     if(tileVector->size()!=0)
@@ -186,7 +199,7 @@ QVector<TileDataClass *> QueueBuilder::FillInVector()
         }
         else
         {
+            saveToFile = new SaveToFileClass(filesVector, constantVector);
             qDebug()<<"Конец";
-            exec();
         }
 }

@@ -70,7 +70,6 @@ void TilerInterface::slotLastElement()
 
 void TilerInterface::slotFinishedRenderTile()
 {
-    sendData = new SaveToFileClass(filesVector,constants);
     emit signalToWidget();
 }
 

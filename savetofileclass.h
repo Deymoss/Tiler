@@ -6,6 +6,8 @@
 #include <QFile>
 #include <QDataStream>
 #include <QTemporaryFile>
+#include <QFileDevice>
+#include <QImage>
 #include "tiledataclass.h"
 #include "MainStruct.h"
 

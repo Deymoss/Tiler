@@ -15,8 +15,6 @@ void RenderClass::run()
     if(!dir.exists("offline_tiles"))
         dir.mkdir("offline_tiles");
 
-    double lattitude, longitude, longitudeOfTheTopRightCorner, lattitudeOfTheTopRightCorner, longitudeOfTheBottomLeftCorner,lattitudeOfTheBottomLeftCorner;
-    double stepLattitude, stepLongitude;
     osmscout::DatabaseParameter databaseParameter;
     osmscout::DatabaseRef       database=std::make_shared<osmscout::Database>(databaseParameter);
     osmscout::MapServiceRef     mapService=std::make_shared<osmscout::MapService>(database);
@@ -38,7 +36,7 @@ void RenderClass::run()
     }
     osmscout::TileProjection      projection;
     osmscout::MapParameter        drawParameter;
-    osmscout::MagnificationLevel level(tileClass->getZoom());
+    osmscout::MagnificationLevel level(tileClass->zoom);
     osmscout::Magnification magnification(level);
     osmscout::AreaSearchParameter searchParameter;
 
@@ -80,13 +78,13 @@ void RenderClass::run()
     osmscout::MapPainterQt painter(styleConfig);
 
 
-    projection.Set(osmscout::OSMTileId(tileClass->getX(),tileClass->getY()),
+    projection.Set(osmscout::OSMTileId(tileClass->x,tileClass->y),
                    magnification,
                    DPI,
                    tileWidth,
                    tileHeight);
     projection.GetDimensions(boundingBox);
-    //std::cout << "Drawing tile " << QString::number(tileClass->getZoom()).toInt() << "." << tileClass->getX() << "." << tileClass->getY() << " " << boundingBox.GetDisplayText() << std::endl;
+    std::cout << "Drawing tile " << QString::number(tileClass->zoom).toInt() << "." << tileClass->x << "." << tileClass->y << " " << boundingBox.GetDisplayText() << std::endl;
     std::list<osmscout::TileRef> centerTiles;
 
     mapService->LookupTiles(magnification,
@@ -98,9 +96,9 @@ void RenderClass::run()
                                     centerTiles);
     std::map<osmscout::TileKey,osmscout::TileRef> ringTileMap;
 
-    for (uint32_t ringY=tileClass->getY()-tileRingSize; ringY<=tileClass->getY()+tileRingSize; ringY++) {
-        for (uint32_t ringX=tileClass->getX()-tileRingSize; ringX<=tileClass->getX()+tileRingSize; ringX++) {
-            if (ringX==tileClass->getX() && ringY==tileClass->getY()) {
+    for (uint32_t ringY=tileClass->y-tileRingSize; ringY<=tileClass->y+tileRingSize; ringY++) {
+        for (uint32_t ringX=tileClass->x-tileRingSize; ringX<=tileClass->x+tileRingSize; ringX++) {
+            if (ringX==tileClass->x && ringY==tileClass->y) {
                 continue;
             }
 
@@ -143,23 +141,12 @@ void RenderClass::run()
                     data,
                     &qp);
 
-    std::string output=std::to_string(tileClass->getZoom())+"_"+std::to_string(tileClass->getX())+"_"+std::to_string(tileClass->getY())+".ppm";
+    std::string output=std::to_string(tileClass->zoom)+"_"+std::to_string(tileClass->x)+"_"+std::to_string(tileClass->y)+".ppm";
 
 
-    uint32_t xOfTile = QString("%1").arg(tileClass->getX()).toUInt();
-    uint32_t yOfTile = QString("%1").arg(tileClass->getY()).toUInt();
-    uint32_t zoom = QString("%1").arg(tileClass->getZoom()).toUInt();
-    longitude = (xOfTile/pow(2,zoom))*360-180;
-    lattitude = atan(sinh(M_PI-(yOfTile/pow(2,zoom))*(2*M_PI)))*(180/M_PI);
-    longitudeOfTheTopRightCorner = (xOfTile/pow(2,zoom))*360-180;
-    lattitudeOfTheTopRightCorner = atan(sinh(M_PI-((yOfTile+1)/pow(2,zoom))*(2*M_PI)))*(180/M_PI);
-    longitudeOfTheBottomLeftCorner = ((xOfTile+1)/pow(2,zoom))*360-180;
-    lattitudeOfTheBottomLeftCorner = atan(sinh(M_PI-(yOfTile/pow(2,zoom))*(2*M_PI)))*(180/M_PI);
-    stepLattitude = (lattitude - lattitudeOfTheTopRightCorner)/256;
-    stepLongitude = (longitudeOfTheBottomLeftCorner - longitude)/256;
+
     //qDebug()<<stepLattitude<<" "<<stepLongitude;
-    pixmap.save(QString("offline_tiles/%0_100-l-%1-%2-%3-%4-%5-%6.png").arg("osm_custom").arg(1).arg(tileClass->getZoom()).arg(tileClass->getX()).arg(tileClass->getY())
-                .arg(stepLattitude).arg(stepLongitude));
+    pixmap.save(QString("offline_tiles/%0_100-l-%1-%2-%3-%4.png").arg("osm_custom").arg(1).arg(tileClass->zoom).arg(tileClass->x).arg(tileClass->y));
     emit endOfRender();
     }
 
