@@ -148,7 +148,7 @@ void QueueBuilder::run()
     FindNecessaryTile *fnc = new FindNecessaryTile(constantVector);
     fnc->getTile(71,42,7);
     FillInVector();
-    emit signalEnd(filesVector,constantVector);
+    emit signalEnd();
 }
 
 TileDataClass* QueueBuilder::getNext()
@@ -199,7 +199,6 @@ QVector<TileDataClass *> QueueBuilder::FillInVector()
         }
         else
         {
-            saveToFile = new SaveToFileClass(filesVector, constantVector);
-            qDebug()<<"Конец";
+             emit signalRenderFinished(filesVector,constantVector);
         }
 }

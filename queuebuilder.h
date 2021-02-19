@@ -47,7 +47,6 @@ private:
     void run() override;
 //    TileStruct *tileData;
     TileDataClass *tileData;
-    SaveToFileClass *saveToFile;
     QVector<QTemporaryFile*> filesVector;
     QVector<ConstantStruct> constantVector;
     static uint16_t FillInLevel;
@@ -56,8 +55,9 @@ private:
     QVector<TileDataClass*> *tileVector;
 signals:
     void signalBegin();//когда начинает строить
-    void signalEnd(QVector<QTemporaryFile*> files, QVector<ConstantStruct> constants);//когда завершилось построениe
+    void signalEnd();//когда завершилось построениe
     void signalLastElement();
+    void signalRenderFinished(QVector<QTemporaryFile*> files, QVector<ConstantStruct> constants);
     void signalThrowCountOfFiles(quint32 count);
 };
 

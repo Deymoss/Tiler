@@ -48,13 +48,11 @@ void TilerInterface::slotBegin()
     //при старте
 }
 
-void TilerInterface::slotEnd(QVector<QTemporaryFile*> files, QVector<ConstantStruct> constants)
+void TilerInterface::slotEnd()
 {
 //    при окончании
-    this->constants = constants;
     countOfThreads = 4;
     RenderClass *renderClass;
-    filesVector = files;
     for(int i=0;i<countOfThreads;i++)
     {
         renderClass = new RenderClass(builder);
@@ -63,8 +61,11 @@ void TilerInterface::slotEnd(QVector<QTemporaryFile*> files, QVector<ConstantStr
     }
 }
 
-void TilerInterface::slotLastElement()
+void TilerInterface::slotLastElement(QVector<QTemporaryFile*> files, QVector<ConstantStruct> constants)
 {
+    this->constants = constants;
+    filesVector = files;
+    saveToFile = new SaveToFileClass(filesVector, constantVector);
 
 }
 

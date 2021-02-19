@@ -2,12 +2,22 @@
 
 SaveToFileClass::SaveToFileClass(QVector<QTemporaryFile*> files, QVector<ConstantStruct> constants)
 {
+    this->files = files;
+    this->constants = constants;
+    this->start();
+}
 
+SaveToFileClass::~SaveToFileClass()
+{
+
+}
+void SaveToFileClass::run()
+{
     QFile file("file.bin");
     if(file.open(QIODevice::WriteOnly))
     {
         QDataStream stream(&file);
-        for(int i =0; i<constants.size(); i++)
+        for(int i =0; i<constants.size(); i++)//запись констант в файл
         {
             stream<<constants.at(i).countOfTiles;
             stream<<constants.at(i).xTileStart;
@@ -17,7 +27,7 @@ SaveToFileClass::SaveToFileClass(QVector<QTemporaryFile*> files, QVector<Constan
         }
 
         int countInputTiles = 0;
-        for(int i=0;i<files.size();i++)
+        for(int i=0;i<files.size();i++)//запись структур с данными о тайлах
         {
             files.at(i)->open();
             QDataStream dataStream(files.at(i));
@@ -33,11 +43,10 @@ SaveToFileClass::SaveToFileClass(QVector<QTemporaryFile*> files, QVector<Constan
         }
         file.close();
         file.open(QIODevice::ReadWrite);
-        //file.seek(sizeof(constants.at(0))*constants.size());
         file.seek(sizeof(constants.at(0))*constants.size());
         QDataStream dataStream(&file);
         int countOutputTiles = 0;
-        while(countOutputTiles!=countInputTiles)
+        while(countOutputTiles!=countInputTiles)//вывод и редактирование структур с учётом информации о размещении самой картинки
         {
             TileDataClass *tiles = new TileDataClass();
             dataStream>>*tiles;
@@ -46,7 +55,7 @@ SaveToFileClass::SaveToFileClass(QVector<QTemporaryFile*> files, QVector<Constan
             tilePic.open(QIODevice::ReadOnly);
             tiles->size = tilePic.size();
             tiles->startPoint = file.size() - 1;
-            file.seek(sizeof(constants.at(0))*constants.size()+sizeof(TileDataClass)*countOutputTiles);//записать в конец файла картинку
+            file.seek(sizeof(constants.at(0))*constants.size()+sizeof(TileDataClass)*countOutputTiles);
             dataStream<<*tiles;
             file.seek(tiles->startPoint);
             file.write(tilePic.readAll());
@@ -56,18 +65,12 @@ SaveToFileClass::SaveToFileClass(QVector<QTemporaryFile*> files, QVector<Constan
         if(stream.status() != QDataStream::Ok)
         {
             qDebug() << "Ошибка записи";
-        }
+        }//отправить сигнал который оповестит о завершении записи в файл, после этого запросить картинку из интерфейса и пробросить её в виджет для вывода.
 
     }
     else
     {
         qDebug()<<"Файл не открыт";
     }
-
-
-}
-
-SaveToFileClass::~SaveToFileClass()
-{
 
 }

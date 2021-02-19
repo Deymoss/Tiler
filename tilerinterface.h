@@ -45,6 +45,7 @@ private:
     QVector<RenderClass*> renderThreads;
     QVector<QTemporaryFile*> filesVector;
     QVector<ConstantStruct> constants;
+    SaveToFileClass *saveToFile;
     double   latTop;
     double latBottom;
     double lonLeft;
@@ -52,16 +53,14 @@ private:
     unsigned int startLevel;
     unsigned int endLevel;
     QString pluginName;
-    SaveToFileClass *sendData;
-
 signals:
     void signalError(TilerInterface::errors err);//enum с ошибками
     void signalToWidget();
     void throwDataToWidget(quint32 count);
 private slots:
     void slotBegin();
-    void slotEnd(QVector<QTemporaryFile*> files, QVector<ConstantStruct> constants);
-    void slotLastElement();
+    void slotEnd();
+    void slotLastElement(QVector<QTemporaryFile*> files, QVector<ConstantStruct> constants);
     void slotFinishedRenderTile();
     void slotCountOfTiles(quint32 count);
 

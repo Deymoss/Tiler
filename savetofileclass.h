@@ -8,15 +8,19 @@
 #include <QTemporaryFile>
 #include <QFileDevice>
 #include <QImage>
+#include <QThread>
 #include "tiledataclass.h"
 #include "MainStruct.h"
 
-class SaveToFileClass : public QObject
+class SaveToFileClass : public QThread
 {
     Q_OBJECT
 public:
     SaveToFileClass(QVector<QTemporaryFile*> files, QVector<ConstantStruct> constants);
     QVector<TileDataClass*> *tileVector;
+    QVector<ConstantStruct> constants;
+    QVector<QTemporaryFile*> files;
+    void run() override;
     ~SaveToFileClass();
 };
 
