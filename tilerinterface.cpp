@@ -2,7 +2,6 @@
 
 TilerInterface::TilerInterface()
 {
-
 }
 
 TilerInterface::~TilerInterface()
@@ -37,6 +36,7 @@ void TilerInterface::throwData(MainStruct data)
 {
     builder = new QueueBuilder(data);
 //    connect(builder, SIGNAL(signalThrowCountOfFiles(long)),this,SLOT(slotCountOfTiles(long)));
+    connect(builder, &QueueBuilder::signalRenderFinished, this, &TilerInterface::slotLastElement);
     connect(builder, &QueueBuilder::signalThrowCountOfFiles,this, &TilerInterface::slotCountOfTiles);
     connect(builder, SIGNAL(signalBegin()),this,SLOT(slotBegin()));
     connect(builder, &QueueBuilder::signalEnd, this, &TilerInterface::slotEnd);
@@ -65,8 +65,9 @@ void TilerInterface::slotLastElement(QVector<QTemporaryFile*> files, QVector<Con
 {
     this->constants = constants;
     filesVector = files;
-    saveToFile = new SaveToFileClass(filesVector, constantVector);
-
+    saveToFile = new SaveToFileClass(filesVector, this->constants);
+    saveToFile->start();
+    connect(saveToFile,&SaveToFileClass::signalForEnd,this,&TilerInterface::endOfSaving);
 }
 
 void TilerInterface::slotFinishedRenderTile()
@@ -76,7 +77,12 @@ void TilerInterface::slotFinishedRenderTile()
 
 void TilerInterface::slotCountOfTiles(quint32 count)
 {
-    emit throwDataToWidget(count);
+    emit signalThrowDataToWidget(count);
+}
+
+void TilerInterface::endOfSaving()
+{
+    emit signalEndOfSaving();
 }
 void TilerInterface::setMap(QString map)
 {

@@ -22,6 +22,8 @@ public:
     QVector<QTemporaryFile*> files;
     void run() override;
     ~SaveToFileClass();
+signals:
+    void signalForEnd();
 };
 
 #endif // SAVETOFILECLASS_H

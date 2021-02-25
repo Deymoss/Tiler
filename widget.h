@@ -11,6 +11,9 @@
 #include <QProgressBar>
 #include <QTimer>
 #include <QStatusBar>
+#include <QImage>
+#include <QFile>
+#include <QPixmap>
 
 #include <iostream>
 #include <iomanip>
@@ -47,6 +50,7 @@ public:
     QLabel * endZoomLabel;
     QLabel * pluginNameLabel;
     QLabel * speedLabel;
+    QLabel * imageLabel;
     QPushButton * startButton;
     QProgressBar * progressBar;
     TilerInterface * interface;
@@ -63,5 +67,6 @@ public slots:
     void slotTileRendered();
     void slotTakeDataTiles(quint32 count);
     void slotSpeed();
+    void showImg();
 };
 #endif // WIDGET_H

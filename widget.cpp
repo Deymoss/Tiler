@@ -1,4 +1,4 @@
-#include "widget.h"
+﻿#include "widget.h"
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
 {
@@ -26,6 +26,7 @@ Widget::Widget(QWidget *parent)
     startButton = new QPushButton(tr("Start"),this);
     progressBar = new QProgressBar(this);
     timer = new QTimer(this);
+    imageLabel = new QLabel(tr("fuck"),this);
     progressBar->setMinimum(0);
     mainLayout->addWidget(importedDataLabel,0,0,1,1);
     mainLayout->addWidget(stylesheetLabel,1,0,1,1);
@@ -37,6 +38,9 @@ Widget::Widget(QWidget *parent)
     mainLayout->addWidget(endZoomLabel,7,0,1,1);
     mainLayout->addWidget(pluginNameLabel,8,0,1,1);
     mainLayout->addWidget(importedDataEdit,0,1,1,1);
+    mainLayout->addWidget(imageLabel,1,2,1,1);
+    imageLabel->setMinimumHeight(256);
+    imageLabel->setMinimumWidth(256);
     importedDataEdit->setText("/home/deymos/imported_data");
     mainLayout->addWidget(stylesheetEdit,1,1,1,1);
     stylesheetEdit->setText("/home/deymos/SIMURAN/libosmscout/stylesheets/standard.oss");
@@ -61,6 +65,7 @@ Widget::Widget(QWidget *parent)
     connect(startButton, &QPushButton::clicked, this, &Widget::drawTile);
     connect(timer,&QTimer::timeout,this,&Widget::slotSpeed);
 
+
 }
 
 Widget::~Widget()
@@ -79,9 +84,10 @@ void Widget::plusProgress()
 void Widget::drawTile()
 {
     interface = new TilerInterface();
+    connect(interface, &TilerInterface::signalEndOfSaving, this, &Widget::showImg);
     connect(interface, SIGNAL(signalError(TilerInterface::errors)),this,SLOT(slotError(TilerInterface::errors)));
     connect(interface,SIGNAL(signalToWidget()),this,SLOT(slotTileRendered()));
-    connect(interface, &TilerInterface::throwDataToWidget,this,&Widget::slotTakeDataTiles);
+    connect(interface, &TilerInterface::signalThrowDataToWidget,this,&Widget::slotTakeDataTiles);
     QString  map;
     QString  style;
     double       latTop,latBottom,lonLeft,lonRight;
@@ -133,4 +139,26 @@ void Widget::slotSpeed()
     speedLabel->setAlignment(Qt::AlignCenter);
     counter= 0;
 
+}
+
+void Widget::showImg()
+{
+  QPixmap pixmap;
+  QByteArray arr;
+  QFile file("file.bin");
+  if(file.open(QIODevice::ReadOnly))
+  {
+  QDataStream stream(&file);
+  file.seek(12400);
+  arr = file.read(17940);
+  QPixmap img;
+  img.loadFromData(arr);
+  QImage image;
+  imageLabel->setPixmap(img);
+  this->update();
+  }
+  else
+  {
+      qDebug()<<"ne otkryto";
+  }
 }

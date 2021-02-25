@@ -5,7 +5,7 @@ uint16_t QueueBuilder::FillInLevel = 0;
 QueueBuilder::QueueBuilder(MainStruct data)
 {
     if(!QDir("/tmp/TileQueue").exists())
-    QDir("/tmp/").mkdir("TileQueue");
+        QDir("/tmp/").mkdir("TileQueue");
     currentData = data;
     mutex = new QMutex();
 }
@@ -18,16 +18,6 @@ QueueBuilder::~QueueBuilder()
 void QueueBuilder::startWork()
 {
     start();
-}
-
-void QueueBuilder::pauseWork()
-{
-
-}
-
-void QueueBuilder::stopWork()
-{
-
 }
 
 QString QueueBuilder::getMapPath()
@@ -49,23 +39,30 @@ void QueueBuilder::run()
     qRegisterMetaType<QVector<ConstantStruct> >("QVector<ConstantStruct>");
     ConstantStruct constants;
     int i=0;
-        QString fileName = "queue-"+QString().number(i+1);
-        QTemporaryFile * file = new QTemporaryFile(QDir::tempPath() + "/TileQueue/" + fileName);
-        filesVector.push_back(file);
+
+    /*This is temporary files for saving coordinate structs, to avoid storing all structs from all zoom ​​in a vector an in a RAM*/
+    QString fileName = "queue-"+QString().number(i+1);
+    QTemporaryFile * file = new QTemporaryFile(QDir::tempPath() + "/TileQueue/" + fileName);
+    filesVector.push_back(file);
+
     if(filesVector.at(0)->open())
     {
         qDebug()<<"Opened"<<filesVector.at(0)->fileName();
     }
 
-    QDataStream dataStream(filesVector.at(0));
+    QDataStream dataStream(filesVector.at(0));//QDataStream for serializing structs
     long int counterOfTiles = 0;
     tileVector = new QVector<TileDataClass*>();
+
     osmscout::AreaSearchParameter searchParameter;
     searchParameter.SetUseLowZoomOptimization(true);
     searchParameter.SetMaximumAreaLevel(3);
+
     for (osmscout::MagnificationLevel level=osmscout::MagnificationLevel(std::min(currentData.startLevel,currentData.endLevel));
          level<=osmscout::MagnificationLevel(std::max(currentData.startLevel,currentData.endLevel));
          level++) {
+
+        /* on this step i'm make a queue of x y z of tile for later rendering*/
 
         osmscout::Magnification magnification(level);
 
@@ -81,15 +78,18 @@ void QueueBuilder::run()
         uint32_t                yTileCount=yTileEnd-yTileStart+1;
 
         std::cout << "Managing zoom " << level << ", " << (xTileCount)*(yTileCount) << " tiles [" << xTileStart << "," << yTileStart << " - " <<  xTileEnd << "," << yTileEnd << "]" << std::endl;
+
         quint32 CountOfTiles = (xTileCount)*(yTileCount);
         emit signalThrowCountOfFiles(CountOfTiles);
         osmscout::MapService::TypeDefinition typeDefinition;
+
         for (quint32 y=yTileStart; y<=yTileEnd; y++) {
             for (quint32 x=xTileStart; x<=xTileEnd; x++) {
-               // qDebug()<<x<<" "<<y;
+                // qDebug()<<x<<" "<<y;
                 tileData = new TileDataClass(x,y,level.Get(),0,0);
-                if(counterOfTiles>=30000000)
+                if(counterOfTiles>=30000000)/* 30 millions it's close to 2 gb RAM, fits to me */
                 {
+                    /* on this step i'm calculating longitude and lattitude of 1 pixel for the subsequent drawing of the route of the members of the search party*/
                     uint32_t xOfTile = QString("%1").arg(tileData->x).toUInt();
                     uint32_t yOfTile = QString("%1").arg(tileData->y).toUInt();
                     uint32_t zoom = QString("%1").arg(tileData->zoom).toUInt();
@@ -101,14 +101,16 @@ void QueueBuilder::run()
                     lattitudeOfTheBottomLeftCorner = atan(sinh(M_PI-(yOfTile/pow(2,zoom))*(2*M_PI)))*(180/M_PI);
                     stepLattitude = (lattitude - lattitudeOfTheTopRightCorner)/256;
                     stepLongitude = (longitudeOfTheBottomLeftCorner - longitude)/256;
+
                     filesVector.at(i)->flush();
                     i++;
                     counterOfTiles = 0;
+
                     QTemporaryFile * file = new QTemporaryFile(QDir::tempPath() + "/TileQueue/" + fileName);
                     filesVector.push_back(file);
                     if(filesVector.at(i)->open())
                     {
-                    qDebug()<<"Opened "<<filesVector.at(i)->fileName();
+                        qDebug()<<"Opened "<<filesVector.at(i)->fileName();
                     }
                     else
                     {
@@ -116,22 +118,22 @@ void QueueBuilder::run()
                     }
                     dataStream.setDevice(filesVector.at(i));
                 }
+
                 counterOfTiles++;
-                //tileVector->append(tileData);
-                dataStream << TileDataClass(tileData->x,tileData->x,tileData->zoom,0,0);
-                //qDebug()<<tileData->getX()<<" "<<tileData->getY()<<" "<<tileData->getZoom();
+                dataStream << TileDataClass(tileData->x,tileData->y,tileData->zoom,0,0);//output data to file
                 delete tileData;
             }
         }
-       filesVector.at(i)->flush();
-        constants.countOfTiles = (xTileCount)*(yTileCount);
+        filesVector.at(i)->flush();
+        constants.countOfTiles = (xTileCount)*(yTileCount);/*in this step i'm saving data for header of my binary file which contains information about the tiles
+                                                             and the tiles themselves, and thanks to these constants I can do a O(1) search*/
         constants.xTileStart = xTileStart;
         constants.yTileStart = yTileStart;
         constants.xTileCount = xTileCount;
         constants.yTileCount = yTileCount;
         constantVector.append(constants);
     }
-    while(constantVector.size()!=20)
+    while(constantVector.size()!=20)//if i rendered <20 zooms, doesen't rendered zooms = 0
     {
         constants.countOfTiles = 0;
         constants.xTileStart = 0;
@@ -140,41 +142,39 @@ void QueueBuilder::run()
         constants.yTileCount = 0;
         constantVector.append(constants);
     }
-    for(int j=0; j<filesVector.size();j++)
+    for(int j=0; j<filesVector.size();j++)//closing all files to throw them to saveToFileClass
     {
 
-     filesVector.at(j)->close();
+        filesVector.at(j)->close();
     }
     FindNecessaryTile *fnc = new FindNecessaryTile(constantVector);
-    fnc->getTile(71,42,7);
+    fnc->getTile(71,42,7);//just test of searching func
     FillInVector();
     emit signalEnd();
 }
 
-TileDataClass* QueueBuilder::getNext()
+TileDataClass* QueueBuilder::getNext()//this function is responsible for throwing file information for the render class
 {
     TileDataClass *output = new TileDataClass(0,0,0,0,0);
 
     mutex->lock();
     if(tileVector->size()!=0)
     {
-    output = tileVector->last();
-    tileVector->pop_back();
-    mutex->unlock();
+        output = tileVector->last();
+        tileVector->pop_back();
+        mutex->unlock();
     }
     else
     {
         FillInVector();
     }
-    //qDebug()<<output->x<<" "<<output->y<<" "<<output->zoom;
     return output;
 }
 
-QVector<TileDataClass *> QueueBuilder::FillInVector()
+QVector<TileDataClass *> QueueBuilder::FillInVector()//if vector out of structs, this fucn open next Temp file and fills the vector with x y zoom of tiles.
 {
-    //qDebug()<<filesVector.at(FillInLevel)->exists();
-        if(filesVector.size() != FillInLevel)
-        {
+    if(filesVector.size() != FillInLevel)
+    {
 
         if(filesVector.at(FillInLevel)->open())
         {
@@ -187,18 +187,15 @@ QVector<TileDataClass *> QueueBuilder::FillInVector()
         {
             TileDataClass *tiles = new TileDataClass();
             dataStream>>*tiles;
-            //qDebug()<<tiles->getX()<<" "<<tiles->getY();
-            tileVector->append(tiles);//разобраться
+            tileVector->append(tiles);
         }
         filesVector.at(FillInLevel)->close();
         FillInLevel++;
 
-//    qDebug()<<tileVector->size();
-    //qDebug()<<tileVector->at(1)->getX()<<" "<<tileVector->at(2)->getX()<<" "<<tileVector->at(50)->getX();
-    return *tileVector;
-        }
-        else
-        {
-             emit signalRenderFinished(filesVector,constantVector);
-        }
+        return *tileVector;
+    }
+    else
+    {
+        emit signalRenderFinished(filesVector,constantVector);
+    }
 }

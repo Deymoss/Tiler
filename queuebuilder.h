@@ -35,8 +35,6 @@ public:
     QueueBuilder(MainStruct data);
     ~QueueBuilder();
     void startWork();
-    void pauseWork();
-    void stopWork();
     QString getMapPath();
     QString getStypePath();
     TileDataClass* getNext();
@@ -45,7 +43,6 @@ public:
 private:
     MainStruct currentData;
     void run() override;
-//    TileStruct *tileData;
     TileDataClass *tileData;
     QVector<QTemporaryFile*> filesVector;
     QVector<ConstantStruct> constantVector;
@@ -54,8 +51,8 @@ private:
     int j = 0;
     QVector<TileDataClass*> *tileVector;
 signals:
-    void signalBegin();//когда начинает строить
-    void signalEnd();//когда завершилось построениe
+    void signalBegin();
+    void signalEnd();
     void signalLastElement();
     void signalRenderFinished(QVector<QTemporaryFile*> files, QVector<ConstantStruct> constants);
     void signalThrowCountOfFiles(quint32 count);
