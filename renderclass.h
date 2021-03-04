@@ -30,6 +30,8 @@ public:
 
     QString  map;
     QString  style;
+    int counter = 0;
+    TileDataClass *tileClass;
     void MergeTilesToMapData(const std::list<osmscout::TileRef>& centerTiles,
                              const osmscout::MapService::TypeDefinition& ringTypeDefinition,
                              const std::list<osmscout::TileRef>& ringTiles,

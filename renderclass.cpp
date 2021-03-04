@@ -2,15 +2,14 @@
 static const unsigned int tileWidth=256;
 static const unsigned int tileHeight=256;
 static const double       DPI=96.0;
-static const int          tileRingSize=1;
+static const int          tileRingSize=2;
 RenderClass::RenderClass(QueueBuilder * builder)
 {
-    currentBuilder = builder;
-    start();
+    currentBuilder = builder; 
 }
 void RenderClass::run()
 {
-    TileDataClass *tileClass = new TileDataClass();
+    qDebug()<<"thread started";
     QDir dir = QDir::current();
     if(!dir.exists("offline_tiles"))
         dir.mkdir("offline_tiles");
@@ -23,7 +22,6 @@ void RenderClass::run()
 
     if (!database->Open(currentBuilder->getMapPath().toStdString())) {
         std::cerr << "Cannot open database" << std::endl;
-
         exit();
     }
 
@@ -48,36 +46,36 @@ void RenderClass::run()
 
     while(!isInterruptionRequested())
     {
-
         tileClass = currentBuilder->getNext();//takes the tile
         osmscout::MagnificationLevel level(tileClass->zoom);
         osmscout::Magnification magnification(level);
 
-        for (const auto& type : database->GetTypeConfig()->GetTypes()) {
-            bool hasLabel=false;
+        projection.SetLinearInterpolationUsage(level.Get() >= 10);
+//        for (const auto& type : database->GetTypeConfig()->GetTypes()) {
+//            bool hasLabel=false;
 
-            if (type->CanBeNode()) {
-                if (styleConfig->HasNodeTextStyles(type,
-                                                   magnification)) {
-                    typeDefinition.nodeTypes.Set(type);
-                    hasLabel=true;
-                }
-            }
+//            if (type->CanBeNode()) {
+//                if (styleConfig->HasNodeTextStyles(type,
+//                                                   magnification)) {
+//                    typeDefinition.nodeTypes.Set(type);
+//                    hasLabel=true;
+//                }
+//            }
 
-            if (type->CanBeArea()) {
-                if (styleConfig->HasAreaTextStyles(type,
-                                                   magnification)) {
-                    if (type->GetOptimizeLowZoom() && searchParameter.GetUseLowZoomOptimization()) {
-                        typeDefinition.optimizedAreaTypes.Set(type);
-                    }
-                    else {
-                        typeDefinition.areaTypes.Set(type);
-                    }
+//            if (type->CanBeArea()) {
+//                if (styleConfig->HasAreaTextStyles(type,
+//                                                   magnification)) {
+//                    if (type->GetOptimizeLowZoom() && searchParameter.GetUseLowZoomOptimization()) {
+//                        typeDefinition.optimizedAreaTypes.Set(type);
+//                    }
+//                    else {
+//                        typeDefinition.areaTypes.Set(type);
+//                    }
 
-                    hasLabel=true;
-                }
-            }
-        }
+//                    hasLabel=true;
+//                }
+//            }
+//        }
 
 
         projection.Set(osmscout::OSMTileId(tileClass->x,tileClass->y),
@@ -147,7 +145,9 @@ void RenderClass::run()
 
         pixmap.save(QString("offline_tiles/%0_100-l-%1-%2-%3-%4.png").arg("osm_custom").arg(1).arg(tileClass->zoom).arg(tileClass->x).arg(tileClass->y));
         emit endOfRender();
+
     }
+    this->exec();
 
 }
 void RenderClass::MergeTilesToMapData(const std::list<osmscout::TileRef>& centerTiles,

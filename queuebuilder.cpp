@@ -151,22 +151,24 @@ void QueueBuilder::run()
     fnc->getTile(71,42,7);//just test of searching func
     FillInVector();
     emit signalEnd();
+    this->exec();
 }
 
 TileDataClass* QueueBuilder::getNext()//this function is responsible for throwing file information for the render class
 {
-    TileDataClass *output = new TileDataClass(0,0,0,0,0);
-
-    mutex->lock();
-    if(tileVector->size()!=0)
+    counterTiles++;
+     mutex->lock();
+    if(tileVector->size()>0)
     {
         output = tileVector->last();
         tileVector->pop_back();
         mutex->unlock();
     }
-    else
+    else if(filesVector.size() != FillInLevel)
     {
+        tileVector->clear();
         FillInVector();
+        mutex->unlock();
     }
     return output;
 }
@@ -191,11 +193,12 @@ QVector<TileDataClass *> QueueBuilder::FillInVector()//if vector out of structs,
         }
         filesVector.at(FillInLevel)->close();
         FillInLevel++;
-
+        mutex->unlock();
         return *tileVector;
     }
     else
     {
         emit signalRenderFinished(filesVector,constantVector);
     }
+
 }

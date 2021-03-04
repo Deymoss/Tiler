@@ -58,6 +58,7 @@ void TilerInterface::slotEnd()
         renderClass = new RenderClass(builder);
         renderThreads.push_back(renderClass);
         connect(renderClass,SIGNAL(endOfRender()),this,SLOT(slotFinishedRenderTile()));
+        renderThreads.at(i)->start();
     }
 }
 

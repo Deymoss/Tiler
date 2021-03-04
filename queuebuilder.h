@@ -38,6 +38,7 @@ public:
     QString getMapPath();
     QString getStypePath();
     TileDataClass* getNext();
+    TileDataClass *output;
     QVector<TileDataClass *> FillInVector();
     static int openFileCounter;
 private:
@@ -49,6 +50,7 @@ private:
     static uint16_t FillInLevel;
     QMutex *mutex;
     int j = 0;
+    int counterTiles = 0;
     QVector<TileDataClass*> *tileVector;
 signals:
     void signalBegin();
