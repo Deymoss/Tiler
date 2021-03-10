@@ -38,6 +38,8 @@ void RenderClass::run()
     drawParameter.SetFontName("/usr/share/fonts/TTF/DejaVuSans.ttf");
     drawParameter.SetFontSize(2.0);
     drawParameter.SetDrawFadings(false);
+    drawParameter.SetDebugData(OsmScoutDebug);
+    drawParameter.SetDebugPerformance(OsmScoutDebug);
     searchParameter.SetUseLowZoomOptimization(true);
     searchParameter.SetMaximumAreaLevel(3);
 
