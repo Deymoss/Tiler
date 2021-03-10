@@ -143,6 +143,9 @@ void RenderClass::run()
                         data,
                         &qp);
 
+        // data are not needed anymore
+        data.ClearDBData();
+
         std::string output=std::to_string(tileClass->zoom)+"_"+std::to_string(tileClass->x)+"_"+std::to_string(tileClass->y)+".ppm";
 
         pixmap.save(QString("offline_tiles/%0_100-l-%1-%2-%3-%4.png").arg("osm_custom").arg(1).arg(tileClass->zoom).arg(tileClass->x).arg(tileClass->y));
