@@ -4,6 +4,7 @@
 #include <QPainter>
 #include <QDir>
 #include <QObject>
+#include <QElapsedTimer>
 
 #include <iomanip>
 #include <QtDebug>
@@ -30,7 +31,7 @@ public:
 
     QString  map;
     QString  style;
-    int counter = 0;
+
     TileDataClass *tileClass;
     void MergeTilesToMapData(const std::list<osmscout::TileRef>& centerTiles,
                              const osmscout::MapService::TypeDefinition& ringTypeDefinition,

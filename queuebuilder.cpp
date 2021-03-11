@@ -54,6 +54,11 @@ void QueueBuilder::run()
     long int counterOfTiles = 0;
     tileVector = new QVector<TileDataClass*>();
 
+    osmscout::log.Debug(OsmScoutDebug);
+       osmscout::log.Info(true);
+       osmscout::log.Warn(true);
+       osmscout::log.Error(true);
+
     osmscout::AreaSearchParameter searchParameter;
     searchParameter.SetUseLowZoomOptimization(true);
     searchParameter.SetMaximumAreaLevel(3);

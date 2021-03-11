@@ -28,12 +28,14 @@
 #include <osmscout/MapPainterQt.h>
 #include <osmscout/util/StopClock.h>
 #include <osmscout/util/Tiling.h>
+constexpr bool OsmScoutDebug = false;
 class QueueBuilder : public QThread
 {
     Q_OBJECT
 public:
     QueueBuilder(MainStruct data);
     ~QueueBuilder();
+
     void startWork();
     QString getMapPath();
     QString getStypePath();

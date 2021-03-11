@@ -2,7 +2,7 @@
 static const unsigned int tileWidth=256;
 static const unsigned int tileHeight=256;
 static const double       DPI=96.0;
-static const int          tileRingSize=2;
+static const int          tileRingSize=1;
 RenderClass::RenderClass(QueueBuilder * builder)
 {
     currentBuilder = builder; 
@@ -13,17 +13,17 @@ void RenderClass::run()
     QDir dir = QDir::current();
     if(!dir.exists("offline_tiles"))
         dir.mkdir("offline_tiles");
-
     osmscout::DatabaseParameter databaseParameter;
     osmscout::DatabaseRef       database=std::make_shared<osmscout::Database>(databaseParameter);
     osmscout::MapServiceRef     mapService=std::make_shared<osmscout::MapService>(database);
     osmscout::GeoBox    boundingBox;
     osmscout::MapData   data;
-
     if (!database->Open(currentBuilder->getMapPath().toStdString())) {
         std::cerr << "Cannot open database" << std::endl;
         exit();
     }
+
+
 
     osmscout::StyleConfigRef styleConfig=std::make_shared<osmscout::StyleConfig>(database->GetTypeConfig());
 
@@ -38,52 +38,30 @@ void RenderClass::run()
     drawParameter.SetFontName("/usr/share/fonts/TTF/DejaVuSans.ttf");
     drawParameter.SetFontSize(2.0);
     drawParameter.SetDrawFadings(false);
+    drawParameter.SetDebugData(OsmScoutDebug);
+    drawParameter.SetDebugPerformance(OsmScoutDebug);
     searchParameter.SetUseLowZoomOptimization(true);
     searchParameter.SetMaximumAreaLevel(3);
 
     osmscout::MapService::TypeDefinition typeDefinition;
     osmscout::MapPainterQt painter(styleConfig);
-
+    osmscout::MagnificationLevel *level = new osmscout::MagnificationLevel(1);
     while(!isInterruptionRequested())
     {
+
         tileClass = currentBuilder->getNext();//takes the tile
-        osmscout::MagnificationLevel level(tileClass->zoom);
-        osmscout::Magnification magnification(level);
-
-        projection.SetLinearInterpolationUsage(level.Get() >= 10);
-//        for (const auto& type : database->GetTypeConfig()->GetTypes()) {
-//            bool hasLabel=false;
-
-//            if (type->CanBeNode()) {
-//                if (styleConfig->HasNodeTextStyles(type,
-//                                                   magnification)) {
-//                    typeDefinition.nodeTypes.Set(type);
-//                    hasLabel=true;
-//                }
-//            }
-
-//            if (type->CanBeArea()) {
-//                if (styleConfig->HasAreaTextStyles(type,
-//                                                   magnification)) {
-//                    if (type->GetOptimizeLowZoom() && searchParameter.GetUseLowZoomOptimization()) {
-//                        typeDefinition.optimizedAreaTypes.Set(type);
-//                    }
-//                    else {
-//                        typeDefinition.areaTypes.Set(type);
-//                    }
-
-//                    hasLabel=true;
-//                }
-//            }
-//        }
-
+        level->Set(tileClass->zoom);
+        osmscout::Magnification magnification (*level);//поинтересоваться про статик. 
+        projection.SetLinearInterpolationUsage(level->Get() >= 10);
 
         projection.Set(osmscout::OSMTileId(tileClass->x,tileClass->y),
                        magnification,
                        DPI,
                        tileWidth,
                        tileHeight);
+
         projection.GetDimensions(boundingBox);
+
         std::cout << "Drawing tile " << QString::number(tileClass->zoom).toInt() << "." << tileClass->x << "." << tileClass->y << " " << boundingBox.GetDisplayText() << std::endl;
         std::list<osmscout::TileRef> centerTiles;
 
@@ -140,7 +118,7 @@ void RenderClass::run()
                         drawParameter,
                         data,
                         &qp);
-
+        data.ClearDBData();
         std::string output=std::to_string(tileClass->zoom)+"_"+std::to_string(tileClass->x)+"_"+std::to_string(tileClass->y)+".ppm";
 
         pixmap.save(QString("offline_tiles/%0_100-l-%1-%2-%3-%4.png").arg("osm_custom").arg(1).arg(tileClass->zoom).arg(tileClass->x).arg(tileClass->y));
