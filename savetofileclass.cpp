@@ -23,6 +23,7 @@ void SaveToFileClass::run()
             stream<<constants.at(i).yTileStart;
             stream<<constants.at(i).xTileCount;
             stream<<constants.at(i).yTileCount;
+            qDebug()<<i;
         }
 
         int countInputTiles = 0;
@@ -55,11 +56,13 @@ void SaveToFileClass::run()
             QFile tilePic(a);
             tilePic.open(QIODevice::ReadOnly);
             tiles->size = tilePic.size();
+
             tiles->startPoint = file.size();
             //qDebug()<<tiles->startPoint<<" "<<tiles->size;
             file.seek(sizeof(constants.at(0))*constants.size()+sizeof(TileDataClass)*countOutputTiles);
             dataStream<<*tiles;
-            file.seek(tiles->startPoint);
+            file.seek(tiles->startPoint); 
+            qDebug()<<tiles->startPoint<<" "<<tiles->size;
             file.write(tilePic.readAll());
             countOutputTiles++;
             file.seek(sizeof(constants.at(0))*constants.size()+sizeof(TileDataClass)*countOutputTiles);
@@ -77,4 +80,19 @@ void SaveToFileClass::run()
     }
     this->exec();
 
+}
+
+void SaveToFileClass::getTile(int x, int y, int zoom)
+{
+    int countOfXNum = x-constants.at(zoom-1).xTileStart;
+    int countOfYnum = y - constants.at(zoom-1).yTileStart;
+    int countTls = constants.at(zoom-1).xTileCount*countOfYnum + countOfXNum;
+    int result = 0;
+    for(int k = 0; k<zoom-1; k++)
+    {
+        result += constants.at(k).countOfTiles;
+    }
+    countTls += result;
+    qDebug()<<countTls;
+    //return countTls;
 }

@@ -50,8 +50,38 @@ void RenderClass::run()
     {
 
         tileClass = currentBuilder->getNext();//takes the tile
+
         level->Set(tileClass->zoom);
         osmscout::Magnification magnification (*level);//поинтересоваться про статик. 
+        for (const auto& type : database->GetTypeConfig()->GetTypes()) {
+            bool hasLabel=false;
+
+            if (type->CanBeNode()) {
+                if (styleConfig->HasNodeTextStyles(type,
+                                                   magnification)) {
+                    typeDefinition.nodeTypes.Set(type);
+                    hasLabel=true;
+                }
+            }
+
+            if (type->CanBeArea()) {
+                if (styleConfig->HasAreaTextStyles(type,
+                                                   magnification)) {
+                    if (type->GetOptimizeLowZoom() && searchParameter.GetUseLowZoomOptimization()) {
+                        typeDefinition.optimizedAreaTypes.Set(type);
+                    }
+                    else {
+                        typeDefinition.areaTypes.Set(type);
+                    }
+
+                    hasLabel=true;
+                }
+            }
+
+            if (hasLabel) {
+                std::cout << "TYPE " << type->GetName() << " might have labels" << std::endl;
+            }
+        }
         projection.SetLinearInterpolationUsage(level->Get() >= 10);
 
         projection.Set(osmscout::OSMTileId(tileClass->x,tileClass->y),

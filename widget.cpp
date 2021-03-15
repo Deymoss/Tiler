@@ -149,8 +149,8 @@ void Widget::showImg()
   if(file.open(QIODevice::ReadOnly))
   {
   QDataStream stream(&file);
-  file.seek(12400);
-  arr = file.read(17940);
+  file.seek(716845);
+  arr = file.read(66763);
   QPixmap img;
   img.loadFromData(arr);
   QImage image;

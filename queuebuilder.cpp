@@ -175,6 +175,10 @@ TileDataClass* QueueBuilder::getNext()//this function is responsible for throwin
         FillInVector();
         mutex->unlock();
     }
+    else
+    {
+        emit signalRenderFinished(filesVector,constantVector);
+    }
     return output;
 }
 
@@ -203,7 +207,9 @@ QVector<TileDataClass *> QueueBuilder::FillInVector()//if vector out of structs,
     }
     else
     {
-        emit signalRenderFinished(filesVector,constantVector);
+        qDebug()<<"EMIT";
+
     }
+
 
 }

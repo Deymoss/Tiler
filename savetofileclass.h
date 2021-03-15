@@ -21,6 +21,7 @@ public:
     QVector<ConstantStruct> constants;
     QVector<QTemporaryFile*> files;
     void run() override;
+    void getTile(int x, int y, int zoom);
     ~SaveToFileClass();
 signals:
     void signalForEnd();
