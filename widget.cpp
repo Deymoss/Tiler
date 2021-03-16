@@ -141,7 +141,7 @@ void Widget::slotSpeed()
 
 }
 
-void Widget::showImg()
+void Widget::showImg(uint32_t one, uint32_t two)
 {
   QPixmap pixmap;
   QByteArray arr;
@@ -149,11 +149,12 @@ void Widget::showImg()
   if(file.open(QIODevice::ReadOnly))
   {
   QDataStream stream(&file);
-  file.seek(716845);
-  arr = file.read(66763);
+  file.seek(one);
+  arr = file.read(two);
   QPixmap img;
   img.loadFromData(arr);
   QImage image;
+  image.fromData(arr);
   imageLabel->setPixmap(img);
   this->update();
   }

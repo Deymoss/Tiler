@@ -32,6 +32,7 @@ QString QueueBuilder::getStypePath()
 
 void QueueBuilder::run()
 {
+
     emit signalBegin();
     double lattitude, longitude, longitudeOfTheTopRightCorner, lattitudeOfTheTopRightCorner, longitudeOfTheBottomLeftCorner,lattitudeOfTheBottomLeftCorner;
     double stepLattitude, stepLongitude;

@@ -8,6 +8,7 @@
 #include <QTemporaryFile>
 #include <QFileDevice>
 #include <QImage>
+#include <QTime>
 #include <QThread>
 #include "tiledataclass.h"
 #include "MainStruct.h"
@@ -24,7 +25,7 @@ public:
     void getTile(int x, int y, int zoom);
     ~SaveToFileClass();
 signals:
-    void signalForEnd();
+    void signalForEnd(uint32_t one, uint32_t two);
 };
 
 #endif // SAVETOFILECLASS_H

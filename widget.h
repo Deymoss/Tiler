@@ -67,6 +67,6 @@ public slots:
     void slotTileRendered();
     void slotTakeDataTiles(quint32 count);
     void slotSpeed();
-    void showImg();
+    void showImg(uint32_t one, uint32_t two);
 };
 #endif // WIDGET_H

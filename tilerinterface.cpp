@@ -81,9 +81,9 @@ void TilerInterface::slotCountOfTiles(quint32 count)
     emit signalThrowDataToWidget(count);
 }
 
-void TilerInterface::endOfSaving()
+void TilerInterface::endOfSaving(uint32_t one, uint32_t two)
 {
-    emit signalEndOfSaving();
+    emit signalEndOfSaving(one, two);
 }
 void TilerInterface::setMap(QString map)
 {

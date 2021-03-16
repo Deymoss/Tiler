@@ -56,7 +56,7 @@ private:
 signals:
     void signalError(TilerInterface::errors err);//enum с ошибками
     void signalToWidget();
-    void signalEndOfSaving();
+    void signalEndOfSaving(uint32_t one, uint32_t two);
     void signalThrowDataToWidget(quint32 count);
 private slots:
     void slotBegin();
@@ -64,7 +64,7 @@ private slots:
     void slotLastElement(QVector<QTemporaryFile*> files, QVector<ConstantStruct> constants);
     void slotFinishedRenderTile();
     void slotCountOfTiles(quint32 count);
-    void endOfSaving();
+    void endOfSaving(uint32_t one, uint32_t two);
 
 };
 

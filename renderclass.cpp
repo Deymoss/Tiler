@@ -48,7 +48,6 @@ void RenderClass::run()
     osmscout::MagnificationLevel *level = new osmscout::MagnificationLevel(1);
     while(!isInterruptionRequested())
     {
-
         tileClass = currentBuilder->getNext();//takes the tile
 
         level->Set(tileClass->zoom);
@@ -79,7 +78,7 @@ void RenderClass::run()
             }
 
             if (hasLabel) {
-                std::cout << "TYPE " << type->GetName() << " might have labels" << std::endl;
+                //std::cout << "TYPE " << type->GetName() << " might have labels" << std::endl;
             }
         }
         projection.SetLinearInterpolationUsage(level->Get() >= 10);
