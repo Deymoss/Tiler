@@ -13,9 +13,12 @@ public:
     uint32_t x;
     uint32_t y;
     uint8_t zoom;
+    double stepLattitude;
+    double stepLongitude;
     uint32_t size;
     uint32_t startPoint;
-        TileDataClass( uint32_t xx, uint32_t yy, uint8_t zzoom, uint32_t ssize, uint32_t sstartPoint) : x( xx ), y( yy ), zoom(zzoom), size(ssize), startPoint(sstartPoint) {
+        TileDataClass( uint32_t xx, uint32_t yy, uint8_t zzoom, double stepLongtude, double stepLattude, uint32_t ssize, uint32_t sstartPoint)
+            : x( xx ), y( yy ), zoom(zzoom), stepLattitude(stepLattude), stepLongitude(stepLongtude), size(ssize), startPoint(sstartPoint) {
         }
     friend QDataStream& operator>>(QDataStream &stream, TileDataClass &data);
     friend QDataStream& operator<<(QDataStream &stream, TileDataClass data);

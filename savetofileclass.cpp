@@ -101,7 +101,7 @@ void SaveToFileClass::getTile(int x, int y, int zoom)
     QFile file("file.bin");
     if(file.open(QIODevice::ReadOnly))
     {
-        TileDataClass *tile = new TileDataClass(0,0,0,0,0);
+        TileDataClass *tile = new TileDataClass(0,0,0,0,0,0,0);
         file.seek(400 + sizeof(TileDataClass)*(countTls));
         QDataStream dataStream(&file);
         dataStream>>*tile;

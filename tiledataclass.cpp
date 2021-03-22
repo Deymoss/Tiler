@@ -2,12 +2,12 @@
 
 QDataStream& operator>>(QDataStream &stream, TileDataClass &data)
 {
-    stream>>data.x>>data.y>>data.zoom>>data.startPoint>>data.size;
+    stream>>data.x>>data.y>>data.zoom>>data.stepLattitude>>data.stepLongitude>>data.startPoint>>data.size;
     return stream;
 }
 QDataStream& operator<<(QDataStream &stream, TileDataClass data)
 {
-    stream<<data.x<<data.y<<data.zoom<<data.startPoint<<data.size;
+    stream<<data.x<<data.y<<data.zoom<<data.stepLattitude<<data.stepLongitude<<data.startPoint<<data.size;
     return stream;
 }
 QDebug operator<<(QDebug debug, TileDataClass &data)

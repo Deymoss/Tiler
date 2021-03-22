@@ -39,17 +39,21 @@ public:
     void startWork();
     QString getMapPath();
     QString getStypePath();
-    TileDataClass* getNext();
+    TileDataClass *getNext();
     TileDataClass *output;
     QVector<TileDataClass *> FillInVector();
     static int openFileCounter;
 private:
     MainStruct currentData;
     void run() override;
+    void countLatLon(uint32_t x, uint32_t y, uint32_t zoom);
     TileDataClass *tileData;
     QVector<QTemporaryFile*> filesVector;
     QVector<ConstantStruct> constantVector;
     static uint16_t FillInLevel;
+    double lattitude, longitude, longitudeOfTheTopRightCorner, lattitudeOfTheTopRightCorner, longitudeOfTheBottomLeftCorner,lattitudeOfTheBottomLeftCorner;
+    double stepLattitude;
+    double stepLongitude;
     QMutex *mutex;
     int j = 0;
     int counterTiles = 0;

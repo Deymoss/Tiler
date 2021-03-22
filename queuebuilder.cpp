@@ -92,22 +92,11 @@ void QueueBuilder::run()
         for (quint32 y=yTileStart; y<=yTileEnd; y++) {
             for (quint32 x=xTileStart; x<=xTileEnd; x++) {
                 // qDebug()<<x<<" "<<y;
-                tileData = new TileDataClass(x,y,level.Get(),0,0);
+                tileData = new TileDataClass(x,y,level.Get(),0,0,0,0);
                 if(counterOfTiles>=30000000)/* 30 millions it's close to 2 gb RAM, fits to me */
                 {
                     /* on this step i'm calculating longitude and lattitude of 1 pixel for the subsequent drawing of the route of the members of the search party*/
-                    uint32_t xOfTile = QString("%1").arg(tileData->x).toUInt();
-                    uint32_t yOfTile = QString("%1").arg(tileData->y).toUInt();
-                    uint32_t zoom = QString("%1").arg(tileData->zoom).toUInt();
-                    longitude = (xOfTile/pow(2,zoom))*360-180;
-                    lattitude = atan(sinh(M_PI-(yOfTile/pow(2,zoom))*(2*M_PI)))*(180/M_PI);
-                    longitudeOfTheTopRightCorner = (xOfTile/pow(2,zoom))*360-180;
-                    lattitudeOfTheTopRightCorner = atan(sinh(M_PI-((yOfTile+1)/pow(2,zoom))*(2*M_PI)))*(180/M_PI);
-                    longitudeOfTheBottomLeftCorner = ((xOfTile+1)/pow(2,zoom))*360-180;
-                    lattitudeOfTheBottomLeftCorner = atan(sinh(M_PI-(yOfTile/pow(2,zoom))*(2*M_PI)))*(180/M_PI);
-                    stepLattitude = (lattitude - lattitudeOfTheTopRightCorner)/256;
-                    stepLongitude = (longitudeOfTheBottomLeftCorner - longitude)/256;
-
+                    countLatLon(x,y,level.Get());
                     filesVector.at(i)->flush();
                     i++;
                     counterOfTiles = 0;
@@ -126,7 +115,7 @@ void QueueBuilder::run()
                 }
 
                 counterOfTiles++;
-                dataStream << TileDataClass(tileData->x,tileData->y,tileData->zoom,0,0);//output data to file
+                dataStream << TileDataClass(tileData->x,tileData->y,tileData->zoom,stepLongitude, stepLattitude, 0,0);//output data to file
                 delete tileData;
             }
         }
@@ -158,6 +147,18 @@ void QueueBuilder::run()
     FillInVector();
     emit signalEnd();
     this->exec();
+}
+
+void QueueBuilder::countLatLon(uint32_t x, uint32_t y, uint32_t zoom)
+{
+    longitude = (x/pow(2,zoom))*360-180;
+    lattitude = atan(sinh(M_PI-(y/pow(2,zoom))*(2*M_PI)))*(180/M_PI);
+    longitudeOfTheTopRightCorner = (x/pow(2,zoom))*360-180;
+    lattitudeOfTheTopRightCorner = atan(sinh(M_PI-((y+1)/pow(2,zoom))*(2*M_PI)))*(180/M_PI);
+    longitudeOfTheBottomLeftCorner = ((x+1)/pow(2,zoom))*360-180;
+    lattitudeOfTheBottomLeftCorner = atan(sinh(M_PI-(y/pow(2,zoom))*(2*M_PI)))*(180/M_PI);
+    stepLattitude = (lattitude - lattitudeOfTheTopRightCorner)/256;
+    stepLongitude = (longitudeOfTheBottomLeftCorner - longitude)/256;
 }
 
 TileDataClass* QueueBuilder::getNext()//this function is responsible for throwing file information for the render class
