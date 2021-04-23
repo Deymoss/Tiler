@@ -84,6 +84,6 @@ When you run the utility, you will see a window with several lines, about almost
 After successful rendering, the tiles will be in the build, in the offline_tiles folder, but loading tiles directly from the folder to the map will lead to lags and long loading of tiles, so another binary file is created in the build folder 
 with which in a split second you can load all the tiles in the required areas on the map, read more [here](https://github.com/Deymoss/OpenStreetMapOfflinePlugin)
 
-##Gratitudes##
+## Gratitudes ##
 I would like to express my gratitude to the libosmscout [developers](https://github.com/Framstag "best man") [for](https://github.com/Karry "one else best man:)") their help with the api.
 And others people who help and inspires me:)
