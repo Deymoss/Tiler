@@ -1,8 +1,8 @@
 # QOsmTilerGui #
 ### Utility for rendering tiles from map DB ###
 
-Using this utility you can render tiles for any area on the earth, instructions are below, tyler works only in conjunction with my offline
-version of the libosmscout plugin? see [there](https://github.com/Deymoss/OpenStreetMapOfflinePlugin/ "Offline plugin"). This is Qt project.
+Using this utility you can render tiles for any area on the earth, instructions are below, tiler works only in conjunction with my offline
+version of the libosmscout plugin, see [there](https://github.com/Deymoss/OpenStreetMapOfflinePlugin/ "Offline plugin"). This is Qt project.
 
 ## Build and install ##
 First of all install all needeed packages
@@ -83,3 +83,7 @@ Now you can open and build QOsmTilerGui
 When you run the utility, you will see a window with several lines, about almost all lines i tell before, last line is Name of plugin, enter name according to your plugin for succsessfull work of qml Map
 After successful rendering, the tiles will be in the build, in the offline_tiles folder, but loading tiles directly from the folder to the map will lead to lags and long loading of tiles, so another binary file is created in the build folder 
 with which in a split second you can load all the tiles in the required areas on the map, read more [here](https://github.com/Deymoss/OpenStreetMapOfflinePlugin)
+
+##Gratitudes##
+I would like to express my gratitude to the libosmscout [developers](https://github.com/Framstag "best man") [for](https://github.com/Karry "one else best man:)") their help with the api.
+And others people who help and inspires me:)
